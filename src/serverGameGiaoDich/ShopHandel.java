@@ -1,9 +1,9 @@
-package serverGameDeChe;
+package serverGameGiaoDich;
 
-import serverGameDeChe.Trade.AbstractData;
-import serverGameDeChe.Trade.Item;
-import serverGameDeChe.Trade.RequestPacket;
-import serverGameDeChe.Trade.UpdateStoreData;
+import serverGameGiaoDich.Trade.AbstractData;
+import serverGameGiaoDich.Trade.Item;
+import serverGameGiaoDich.Trade.RequestPacket;
+import serverGameGiaoDich.Trade.UpdateStoreData;
 
 public class ShopHandel {
     private int gold;

@@ -1,4 +1,4 @@
-package serverGameDeChe.Trade;
+package serverGameGiaoDich.Trade;
 
 import com.google.gson.Gson;
 

@@ -1,4 +1,4 @@
-package serverGameDeChe.Enum;
+package serverGameGiaoDich.Enum;
 
 public enum PacketType {
     Buy, //0

@@ -1,6 +1,4 @@
-package serverGameDeChe.Trade;
-
-import serverGameDeChe.Enum.ItemType;
+package serverGameGiaoDich.Trade;
 
 public class Item {
     public int itemType;
