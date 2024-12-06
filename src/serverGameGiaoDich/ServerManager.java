@@ -37,14 +37,19 @@ public class ServerManager extends WebSocketServer {
             switch (packet.getPacketType()) {
                 case 0:
                     ResponseDataToClient(conn, shop.HandelBuyByClient(packet.getAbstractData()));
-                    broadcastMessage(shop.HandelBuyByClient(packet.getAbstractData()));
+                    broadcastMessage(shop.HandelUpdatePriceStore());
                     break;
+
                 case 1:
-                    //Todo sell
+                    ResponseDataToClient(conn, shop.HandelSellByClient(packet.getAbstractData()));
+                    broadcastMessage(shop.HandelUpdatePriceStore());
                     break;
-                case 2:
+
+                case 4:
                     ResponseDataToClient(conn, shop.HandelUpdatePriceStore());
+
                     break;
+
             }
 
         } catch (Exception e) {
