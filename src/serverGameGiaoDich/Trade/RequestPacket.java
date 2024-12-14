@@ -6,6 +6,9 @@ public class RequestPacket {
     private int packetType;
     private AbstractData abstractData;
     private UpdateStoreData updateStoreData;
+    private String namePlayer;      // Tên người chơi
+    private String messagePlayer;   // Tin nhắn
+    private String dayPlay;    // Dùng cho PacketType 8
 
     public RequestPacket(int packetType) {
         this.packetType = packetType;
@@ -25,18 +28,25 @@ public class RequestPacket {
         this.updateStoreData = updateStoreData;
     }
 
+    // Constructor cho SendMessage và BroadcastMessage
+    public RequestPacket(int packetType, String namePlayer, String messagePlayer) {
+        this.packetType = packetType;
+        this.namePlayer = namePlayer;
+        this.messagePlayer = messagePlayer;
+        this.abstractData = null;
+        this.updateStoreData = null;
+    }
+
     public static String toJson(RequestPacket requestPacket) {
         Gson gson = new Gson();
         return gson.toJson(requestPacket);
     }
 
-    // Chuyển JSON về đối tượng RequestPacket
     public static RequestPacket fromJson(String json) {
         Gson gson = new Gson();
         return gson.fromJson(json, RequestPacket.class);
     }
 
-    // Getters and Setters nếu cần
     public int getPacketType() {
         return packetType;
     }
@@ -59,5 +69,29 @@ public class RequestPacket {
 
     public void setUpdateStoreData(UpdateStoreData updateStoreData) {
         this.updateStoreData = updateStoreData;
+    }
+
+    public String getNamePlayer() {
+        return namePlayer;
+    }
+
+    public void setNamePlayer(String namePlayer) {
+        this.namePlayer = namePlayer;
+    }
+
+    public String getMessagePlayer() {
+        return messagePlayer;
+    }
+
+    public void setMessagePlayer(String messagePlayer) {
+        this.messagePlayer = messagePlayer;
+    }
+    
+    public String getDayPlay() {
+        return dayPlay;
+    }
+
+    public void setDayPlay(String dayPlay) {
+        this.dayPlay = dayPlay;
     }
 }
