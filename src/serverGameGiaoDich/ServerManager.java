@@ -7,20 +7,17 @@ import serverGameGiaoDich.Trade.RequestPacket;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerManager extends WebSocketServer {
 
     // Danh sách quản lý các client đã kết nối
     private final List<WebSocket> clients = new ArrayList<>();
 
-    // Quản lý tên các player
-    private final Map<WebSocket, String> playerNames = new HashMap<>();
-
-    // Quản lý ngày chơi của player
-    private final Map<WebSocket, String> playerDays = new HashMap<>();
+    // Quản lý thông tin player
+    private final Map<WebSocket, PlayerInfo> playerInfoMap = new ConcurrentHashMap<>();
 
     // Shop handler (giữ nguyên để phục vụ các tính năng khác)
     private ShopHandel shop = new ShopHandel();
@@ -71,6 +68,10 @@ public class ServerManager extends WebSocketServer {
                     handleDayPlay(conn, packet);
                     break;
 
+                case 17: // PacketType 17: Nhận tin nhắn từ player
+                    handleMessagePlayer(conn, packet);
+                    break;
+
                 default:
                     System.err.println("Unknown packet type: " + packet.getPacketType());
             }
@@ -83,16 +84,9 @@ public class ServerManager extends WebSocketServer {
     // Khi một client đóng kết nối
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        synchronized (playerNames) {
-            if (playerNames.containsKey(conn)) {
-                String namePlayer = playerNames.remove(conn);
-                System.out.println("Player đã thoát: " + namePlayer);
-            }
-        }
-        synchronized (playerDays) {
-            if (playerDays.containsKey(conn)) {
-                playerDays.remove(conn);
-            }
+        if (playerInfoMap.containsKey(conn)) {
+            PlayerInfo info = playerInfoMap.remove(conn);
+            System.out.println("Player đã thoát: " + info.getName());
         }
         clients.remove(conn);
         System.out.println("Connection closed: " + conn.getRemoteSocketAddress());
@@ -118,11 +112,12 @@ public class ServerManager extends WebSocketServer {
             return;
         }
 
-        synchronized (playerNames) {
-            if (playerNames.containsValue(namePlayer)) {
+        synchronized (playerInfoMap) {
+            boolean nameExists = playerInfoMap.values().stream().anyMatch(info -> namePlayer.equals(info.getName()));
+            if (nameExists) {
                 System.out.println("Tên player đã tồn tại: " + namePlayer);
             } else {
-                playerNames.put(conn, namePlayer);
+                playerInfoMap.put(conn, new PlayerInfo(namePlayer, null));
                 System.out.println("Player mới được đăng ký: " + namePlayer);
             }
         }
@@ -140,12 +135,12 @@ public class ServerManager extends WebSocketServer {
 
     // Xử lý gửi lại tên player đã đăng ký
     private void handleRequestPlayerName(WebSocket conn) {
-        synchronized (playerNames) {
-            if (playerNames.containsKey(conn)) {
-                String namePlayer = playerNames.get(conn);
-                RequestPacket response = new RequestPacket(16, namePlayer, null); // PacketType 16
+        synchronized (playerInfoMap) {
+            PlayerInfo info = playerInfoMap.get(conn);
+            if (info != null && info.getName() != null) {
+                RequestPacket response = new RequestPacket(16, info.getName(), null); // PacketType 16
                 ResponseDataToClient(conn, response);
-                System.out.println("Tên player được gửi lại: " + namePlayer);
+                System.out.println("Tên player được gửi lại: " + info.getName());
             } else {
                 System.err.println("Player chưa đăng ký tên!");
             }
@@ -161,10 +156,31 @@ public class ServerManager extends WebSocketServer {
             return;
         }
 
-        synchronized (playerDays) {
-            playerDays.put(conn, dayPlay);
-            System.out.println("Ngày chơi được lưu: " + dayPlay + " cho player: " + playerNames.get(conn));
+        synchronized (playerInfoMap) {
+            PlayerInfo info = playerInfoMap.get(conn);
+            if (info != null) {
+                info.setDayPlay(dayPlay);
+                System.out.println("Ngày chơi được lưu: " + dayPlay + " cho player: " + info.getName());
+            } else {
+                System.err.println("Player chưa đăng ký, không thể lưu ngày chơi!");
+            }
         }
+    }
+
+    // Xử lý tin nhắn từ player (Task 1)
+    private void handleMessagePlayer(WebSocket conn, RequestPacket packet) {
+        String namePlayer = packet.getNamePlayer();
+        String messagePlayer = packet.getMessagePlayer();
+
+        if (namePlayer == null || namePlayer.isEmpty() || messagePlayer == null || messagePlayer.isEmpty()) {
+            System.err.println("Thông tin tin nhắn không hợp lệ!");
+            return;
+        }
+
+        // Gửi phản hồi PacketType 18 đến tất cả client
+        RequestPacket response = new RequestPacket(18, namePlayer, messagePlayer);
+        broadcastMessage(response);
+        System.out.println("Tin nhắn từ player: " + namePlayer + ", Nội dung: " + messagePlayer);
     }
 
     public void ResponseDataToClient(WebSocket conn, RequestPacket packet) {
@@ -183,5 +199,32 @@ public class ServerManager extends WebSocketServer {
         int port = 5555; // Cổng của server
         ServerManager server = new ServerManager(port);
         server.start();
+    }
+}
+
+// Class quản lý thông tin player
+class PlayerInfo {
+    private String name;
+    private String dayPlay;
+
+    public PlayerInfo(String name, String dayPlay) {
+        this.name = name;
+        this.dayPlay = dayPlay;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDayPlay() {
+        return dayPlay;
+    }
+
+    public void setDayPlay(String dayPlay) {
+        this.dayPlay = dayPlay;
     }
 }
