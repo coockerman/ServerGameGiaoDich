@@ -56,16 +56,16 @@ public class ServerManager extends WebSocketServer {
                     ResponseDataToClient(conn, shop.HandelUpdatePriceStore());
                     break;
 
+                case 8: // PacketType 8: Lưu ngày chơi của player
+                    handleDayPlay(conn, packet);
+                    break;
+
                 case 13: // PacketType 13: Đăng ký tên Player
                     handleRegisterPlayer(conn, packet);
                     break;
 
                 case 15: // PacketType 15: Gửi lại tên player đã đăng ký
                     handleRequestPlayerName(conn);
-                    break;
-
-                case 8: // PacketType 8: Lưu ngày chơi của player
-                    handleDayPlay(conn, packet);
                     break;
 
                 case 17: // PacketType 17: Nhận tin nhắn từ player
@@ -122,13 +122,13 @@ public class ServerManager extends WebSocketServer {
             }
         }
 
-        // Gửi phản hồi PacketType 16
+        // Gửi phản hồi PacketType 19
         sendPlayerRegistrationResponse(conn, namePlayer);
     }
 
     // Gửi phản hồi đăng ký player về client
     private void sendPlayerRegistrationResponse(WebSocket conn, String namePlayer) {
-        RequestPacket response = new RequestPacket(16, namePlayer, null); // PacketType 16
+        RequestPacket response = new RequestPacket(19, namePlayer,  true); // PacketType 19
         ResponseDataToClient(conn, response);
         System.out.println("Phản hồi đăng ký gửi cho player: " + namePlayer);
     }

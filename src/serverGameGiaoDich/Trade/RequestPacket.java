@@ -9,6 +9,7 @@ public class RequestPacket {
     private String namePlayer;      // Tên người chơi
     private String messagePlayer;   // Tin nhắn
     private String dayPlay;    // Dùng cho PacketType 8
+    private boolean isRegisterPlayer;
 
     public RequestPacket(int packetType) {
         this.packetType = packetType;
@@ -22,6 +23,11 @@ public class RequestPacket {
         this.updateStoreData = null;
     }
 
+    public RequestPacket(int packetType, String namePlayer, boolean isRegisterPlayer) {
+        this.packetType = packetType;
+        this.namePlayer = namePlayer;
+        this.isRegisterPlayer = isRegisterPlayer;
+    }
     public RequestPacket(int packetType, UpdateStoreData updateStoreData) {
         this.packetType = packetType;
         this.abstractData = null;
@@ -93,5 +99,13 @@ public class RequestPacket {
 
     public void setDayPlay(String dayPlay) {
         this.dayPlay = dayPlay;
+    }
+
+    public boolean isRegisterPlayer() {
+        return isRegisterPlayer;
+    }
+
+    public void setRegisterPlayer(boolean registerPlayer) {
+        isRegisterPlayer = registerPlayer;
     }
 }
