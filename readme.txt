@@ -1,1 +1,2 @@
-Đây là server game giao dịch
+Sửa đổi
+oke
