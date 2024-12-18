@@ -1,1 +1,2 @@
-Đây là server game giao dịch
+Đây là server game giao  dịch
+rồi jjj
