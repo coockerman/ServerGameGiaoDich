@@ -3,7 +3,9 @@ package serverGameGiaoDich;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import serverGameGiaoDich.Trade.InfoPlayer;
 import serverGameGiaoDich.Trade.RequestPacket;
+import serverGameGiaoDich.Trade.SoldierData;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ public class ServerManager extends WebSocketServer {
     private final List<WebSocket> clients = new ArrayList<>();
 
     // Quản lý thông tin player
-    private final Map<WebSocket, PlayerInfo> playerInfoMap = new ConcurrentHashMap<>();
+    private final Map<WebSocket, InfoPlayer> playerInfoMap = new ConcurrentHashMap<>();
 
     // Shop handler (giữ nguyên để phục vụ các tính năng khác)
     private ShopHandel shop = new ShopHandel();
@@ -59,6 +61,9 @@ public class ServerManager extends WebSocketServer {
                 case 8: // PacketType 8: Lưu ngày chơi của player
                     handleDayPlay(conn, packet);
                     break;
+                case 11:
+                    handleFindPlayerAttack(conn);
+                    break;
 
                 case 13: // PacketType 13: Đăng ký tên Player
                     handleRegisterPlayer(conn, packet);
@@ -85,8 +90,8 @@ public class ServerManager extends WebSocketServer {
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         if (playerInfoMap.containsKey(conn)) {
-            PlayerInfo info = playerInfoMap.remove(conn);
-            System.out.println("Player đã thoát: " + info.getName());
+            InfoPlayer info = playerInfoMap.remove(conn);
+            System.out.println("Player đã thoát: " + info.getNamePlayer());
         }
         clients.remove(conn);
         System.out.println("Connection closed: " + conn.getRemoteSocketAddress());
@@ -113,11 +118,15 @@ public class ServerManager extends WebSocketServer {
         }
 
         synchronized (playerInfoMap) {
-            boolean nameExists = playerInfoMap.values().stream().anyMatch(info -> namePlayer.equals(info.getName()));
+            boolean nameExists = playerInfoMap.values().stream().anyMatch(info -> namePlayer.equals(info.getNamePlayer()));
             if (nameExists) {
                 System.out.println("Tên player đã tồn tại: " + namePlayer);
             } else {
-                playerInfoMap.put(conn, new PlayerInfo(namePlayer, null));
+                playerInfoMap.put(conn, new InfoPlayer(
+                        conn.getRemoteSocketAddress().getAddress().getHostAddress(),
+                        namePlayer,
+                        null,
+                        null));
                 System.out.println("Player mới được đăng ký: " + namePlayer);
             }
         }
@@ -136,11 +145,11 @@ public class ServerManager extends WebSocketServer {
     // Xử lý gửi lại tên player đã đăng ký
     private void handleRequestPlayerName(WebSocket conn) {
         synchronized (playerInfoMap) {
-            PlayerInfo info = playerInfoMap.get(conn);
-            if (info != null && info.getName() != null) {
-                RequestPacket response = new RequestPacket(16, info.getName(), null); // PacketType 16
+            InfoPlayer info = playerInfoMap.get(conn);
+            if (info != null && info.getNamePlayer() != null) {
+                RequestPacket response = new RequestPacket(16, info.getNamePlayer(), null); // PacketType 16
                 ResponseDataToClient(conn, response);
-                System.out.println("Tên player được gửi lại: " + info.getName());
+                System.out.println("Tên player được gửi lại: " + info.getNamePlayer());
             } else {
                 System.err.println("Player chưa đăng ký tên!");
             }
@@ -157,16 +166,44 @@ public class ServerManager extends WebSocketServer {
         }
 
         synchronized (playerInfoMap) {
-            PlayerInfo info = playerInfoMap.get(conn);
+            InfoPlayer info = playerInfoMap.get(conn);
             if (info != null) {
-                info.setDayPlay(dayPlay);
-                System.out.println("Ngày chơi được lưu: " + dayPlay + " cho player: " + info.getName());
+                info.setDayPlayer(dayPlay);
+                info.setSoldierData(packet.getSoldierData());
+                System.out.println("Ngày chơi được lưu: " + dayPlay +
+                        " cho player: " + info.getNamePlayer());
             } else {
                 System.err.println("Player chưa đăng ký, không thể lưu ngày chơi!");
             }
         }
     }
+    private void handleFindPlayerAttack(WebSocket conn) {
+        // Danh sách những người chơi trên 30 ngày
+        List<InfoPlayer> activePlayers = new ArrayList<>();
 
+        synchronized (playerInfoMap) {
+            for (Map.Entry<WebSocket, InfoPlayer> entry : playerInfoMap.entrySet()) {
+                InfoPlayer info = entry.getValue();
+
+                if (info.getDayPlayer() != null) {
+                    try {
+                        int days = Integer.parseInt(info.getDayPlayer());
+                        if (days >= 30) {
+                            InfoPlayer player = new InfoPlayer(info.getIpPlayer(), info.getNamePlayer(), String.valueOf(days), info.getSoldierData());
+                            activePlayers.add(player);
+                        }
+                    } catch (NumberFormatException e) {
+                        System.err.println("Lỗi chuyển đổi ngày chơi: " + info.getDayPlayer());
+                    }
+                }
+            }
+        }
+
+        // Gửi danh sách những người chơi về cho client
+        RequestPacket response = new RequestPacket(9, activePlayers); // Gói tin số 9
+        ResponseDataToClient(conn, response);
+        System.out.println("Gửi danh sách những người chơi trên 30 ngày về client.");
+    }
     // Xử lý tin nhắn từ player (Task 1)
     private void handleMessagePlayer(WebSocket conn, RequestPacket packet) {
         String namePlayer = packet.getNamePlayer();
@@ -202,29 +239,3 @@ public class ServerManager extends WebSocketServer {
     }
 }
 
-// Class quản lý thông tin player
-class PlayerInfo {
-    private String name;
-    private String dayPlay;
-
-    public PlayerInfo(String name, String dayPlay) {
-        this.name = name;
-        this.dayPlay = dayPlay;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDayPlay() {
-        return dayPlay;
-    }
-
-    public void setDayPlay(String dayPlay) {
-        this.dayPlay = dayPlay;
-    }
-}

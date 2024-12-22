@@ -2,6 +2,8 @@ package serverGameGiaoDich.Trade;
 
 import com.google.gson.Gson;
 
+import java.util.List;
+
 public class RequestPacket {
     private int packetType;
     private AbstractData abstractData;
@@ -9,12 +11,18 @@ public class RequestPacket {
     private String namePlayer;      // Tên người chơi
     private String messagePlayer;   // Tin nhắn
     private String dayPlay;    // Dùng cho PacketType 8
+    private SoldierData soldierData;
     private boolean isRegisterPlayer;
+    public List<InfoPlayer> infoPlayers;
 
     public RequestPacket(int packetType) {
         this.packetType = packetType;
         this.abstractData = new AbstractData(true);
         this.updateStoreData = null;
+    }
+    public RequestPacket(int packetType, List<InfoPlayer> infoPlayers) {
+        this.packetType = packetType;
+        this.infoPlayers = infoPlayers;
     }
 
     public RequestPacket(int packetType, AbstractData abstractData) {
@@ -107,5 +115,13 @@ public class RequestPacket {
 
     public void setRegisterPlayer(boolean registerPlayer) {
         isRegisterPlayer = registerPlayer;
+    }
+
+    public SoldierData getSoldierData() {
+        return soldierData;
+    }
+
+    public void setSoldierData(SoldierData soldierData) {
+        this.soldierData = soldierData;
     }
 }

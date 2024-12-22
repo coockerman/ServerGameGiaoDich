@@ -12,7 +12,7 @@ public enum PacketType {
     DayPlay, //8
     ResponsePlayerCanAttack, //9
     AttackPlayer, //10
-    ResponseInformationAfterDa, //11
+    FindPlayerCanAttack, //11
     ResponsePlayerAttack, //12
     RegisterPlayer, //13
     ResponseResultAndResource, //14
