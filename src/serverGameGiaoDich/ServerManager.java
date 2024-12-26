@@ -16,7 +16,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServerManager extends WebSocketServer {
 
     // <editor-fold desc="Tạm ẩn các thuộc tính">
-    private final List<WebSocket> clients = new ArrayList<>();
     private final Map<WebSocket, InfoPlayer> playerInfoMap = new ConcurrentHashMap<>();
     private ShopHandel shop = new ShopHandel();
     // </editor-fold>
@@ -26,7 +25,8 @@ public class ServerManager extends WebSocketServer {
     // Khi một client kết nối
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        clients.add(conn);
+        //clients.add(conn);
+        playerInfoMap.put(conn, new InfoPlayer(conn.getRemoteSocketAddress().getAddress().getHostAddress(), null, null, null));
         System.out.println("Connect: " + conn.getRemoteSocketAddress());
         ResponseDataToClient(conn, shop.HandelUpdatePriceStore());
     }
@@ -86,7 +86,6 @@ public class ServerManager extends WebSocketServer {
             InfoPlayer info = playerInfoMap.remove(conn);
             System.out.println("Player đã thoát: " + info.getNamePlayer());
         }
-        clients.remove(conn);
         System.out.println("Connection closed: " + conn.getRemoteSocketAddress());
     }
     // Khi xảy ra lỗi
@@ -176,32 +175,31 @@ public class ServerManager extends WebSocketServer {
         }
     }
     private void handleFindPlayerAttack(WebSocket conn) {
-        // Danh sách những người chơi trên 30 ngày
+        // Danh sách những người chơi trên 10 ngày
         List<InfoPlayer> activePlayers = new ArrayList<>();
 
-        synchronized (playerInfoMap) {
-            for (Map.Entry<WebSocket, InfoPlayer> entry : playerInfoMap.entrySet()) {
-                InfoPlayer info = entry.getValue();
-
-                if (info.getDayPlayer() != null) {
-                    try {
-                        int days = Integer.parseInt(info.getDayPlayer());
-                        if (days >= 10) {
-                            InfoPlayer player = new InfoPlayer(info.getIpPlayer(), info.getNamePlayer(), String.valueOf(days), info.getSoldierData());
-                            activePlayers.add(player);
-                        }
-                    } catch (NumberFormatException e) {
-                        System.err.println("Lỗi chuyển đổi ngày chơi: " + info.getDayPlayer());
+        for (InfoPlayer info : playerInfoMap.values()) {
+            if (info.getDayPlayer() != null) {
+                try {
+                    int days = Integer.parseInt(info.getDayPlayer());
+                    if (days >= 10) {
+                        activePlayers.add(info); // Thêm trực tiếp
                     }
+                } catch (NumberFormatException e) {
+                    System.err.println("Lỗi chuyển đổi ngày chơi từ người chơi có IP: " + info.getIpPlayer());
                 }
             }
         }
 
         // Gửi danh sách những người chơi về cho client
-        RequestPacket response = new RequestPacket(9, activePlayers); // Gói tin số 9
-        ResponseDataToClient(conn, response);
-        System.out.println("Gửi danh sách những người chơi trên 30 ngày về client.");
+        RequestPacket response = new RequestPacket(9, activePlayers);
+        if (conn.isOpen()) {
+            ResponseDataToClient(conn, response);
+        } else {
+            System.err.println("Kết nối WebSocket không hợp lệ.");
+        }
     }
+
     // Xử lý tin nhắn từ player (Task 1)
     private void handleMessagePlayer(WebSocket conn, RequestPacket packet) {
         String namePlayer = packet.getNamePlayer();
@@ -237,10 +235,13 @@ public class ServerManager extends WebSocketServer {
 
     // Gửi tin nhắn đến tất cả client
     public void broadcastMessage(RequestPacket packet) {
-        for (WebSocket client : clients) {
-            client.send(RequestPacket.toJson(packet));
+        for (WebSocket conn : playerInfoMap.keySet()) {
+            if (conn.isOpen()) {
+                conn.send(RequestPacket.toJson(packet));
+            }
         }
     }
+
 
     // Main method để khởi chạy server
     public static void main(String[] args) {
