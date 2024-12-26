@@ -111,6 +111,7 @@ public class ServerManager extends WebSocketServer {
             boolean nameExists = playerInfoMap.values().stream().anyMatch(info -> namePlayer.equals(info.getNamePlayer()));
             if (nameExists) {
                 System.out.println("Tên player đã tồn tại: " + namePlayer);
+                sendPlayerRegistrationResponse(conn, namePlayer, false);
             } else {
                 playerInfoMap.put(conn, new InfoPlayer(
                         conn.getRemoteSocketAddress().getAddress().getHostAddress(),
@@ -124,16 +125,17 @@ public class ServerManager extends WebSocketServer {
                 // Gửi phản hồi PacketType 18 đến tất cả client
                 RequestPacket response = new RequestPacket(18, dataNameJoin, dataJoin);
                 broadcastMessage(response);
+                // Gửi phản hồi PacketType 19
+                sendPlayerRegistrationResponse(conn, namePlayer, true);
             }
         }
 
-        // Gửi phản hồi PacketType 19
-        sendPlayerRegistrationResponse(conn, namePlayer);
+
     }
 
     // Gửi phản hồi đăng ký player về client
-    private void sendPlayerRegistrationResponse(WebSocket conn, String namePlayer) {
-        RequestPacket response = new RequestPacket(19, namePlayer,  true); // PacketType 19
+    private void sendPlayerRegistrationResponse(WebSocket conn, String namePlayer, boolean status) {
+        RequestPacket response = new RequestPacket(19, namePlayer,  status); // PacketType 19
         ResponseDataToClient(conn, response);
         System.out.println("Phản hồi đăng ký gửi cho player: " + namePlayer);
     }
@@ -210,25 +212,38 @@ public class ServerManager extends WebSocketServer {
             return;
         }
 
-        // Gửi phản hồi PacketType 18 đến tất cả client
-        RequestPacket response = new RequestPacket(18, namePlayer, messagePlayer);
-        broadcastMessage(response);
-        System.out.println("Tin nhắn từ player: " + namePlayer + ", Nội dung: " + messagePlayer);
-    }
-    private void handleMessagePlayerJoinServer(WebSocket conn, RequestPacket packet) {
-        String namePlayer = packet.getNamePlayer();
-        String messagePlayer = packet.getMessagePlayer();
+        if (messagePlayer.startsWith("@")) {
+            int spaceIndex = messagePlayer.indexOf(" ");
+            if (spaceIndex > 1) {
+                String targetPlayer = messagePlayer.substring(1, spaceIndex);
+                String privateMessage = messagePlayer.substring(spaceIndex + 1);
 
-        if (namePlayer == null || namePlayer.isEmpty() || messagePlayer == null || messagePlayer.isEmpty()) {
-            System.err.println("Thông tin tin nhắn không hợp lệ!");
-            return;
+                WebSocket targetConn = findPlayerConnection(targetPlayer);
+                if (targetConn != null) {
+                    RequestPacket response = new RequestPacket(18, namePlayer + "[Chat riêng]", privateMessage);
+                    ResponseDataToClient(targetConn, response);
+                    System.out.println("Tin nhắn riêng từ " + namePlayer + " đến " + targetPlayer + ": " + privateMessage);
+                } else {
+                    System.err.println("Không tìm thấy người chơi: " + targetPlayer);
+                }
+                return;
+            }
         }
 
-        // Gửi phản hồi PacketType 18 đến tất cả client
         RequestPacket response = new RequestPacket(18, namePlayer, messagePlayer);
         broadcastMessage(response);
         System.out.println("Tin nhắn từ player: " + namePlayer + ", Nội dung: " + messagePlayer);
     }
+    private WebSocket findPlayerConnection(String playerName) {
+        for (WebSocket client : playerInfoMap.keySet()) {
+            InfoPlayer info = playerInfoMap.get(client);
+            if (info != null && playerName.equals(info.getNamePlayer())) {
+                return client;
+            }
+        }
+        return null;
+    }
+
     public void ResponseDataToClient(WebSocket conn, RequestPacket packet) {
         conn.send(RequestPacket.toJson(packet));
     }
