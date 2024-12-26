@@ -15,20 +15,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerManager extends WebSocketServer {
 
-    // Danh sách quản lý các client đã kết nối
+    // <editor-fold desc="Tạm ẩn các thuộc tính">
     private final List<WebSocket> clients = new ArrayList<>();
-
-    // Quản lý thông tin player
     private final Map<WebSocket, InfoPlayer> playerInfoMap = new ConcurrentHashMap<>();
-
-    // Shop handler (giữ nguyên để phục vụ các tính năng khác)
     private ShopHandel shop = new ShopHandel();
-
-    // Constructor
+    // </editor-fold>
     public ServerManager(int port) {
         super(new InetSocketAddress(port));
     }
-
     // Khi một client kết nối
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
@@ -36,7 +30,6 @@ public class ServerManager extends WebSocketServer {
         System.out.println("Connect: " + conn.getRemoteSocketAddress());
         ResponseDataToClient(conn, shop.HandelUpdatePriceStore());
     }
-
     // Khi server nhận tin nhắn từ client
     @Override
     public void onMessage(WebSocket conn, String message) {
@@ -61,6 +54,7 @@ public class ServerManager extends WebSocketServer {
                 case 8: // PacketType 8: Lưu ngày chơi của player
                     handleDayPlay(conn, packet);
                     break;
+
                 case 11:
                     handleFindPlayerAttack(conn);
                     break;
@@ -85,7 +79,6 @@ public class ServerManager extends WebSocketServer {
             System.err.println("Error processing message: " + e.getMessage());
         }
     }
-
     // Khi một client đóng kết nối
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
@@ -96,13 +89,11 @@ public class ServerManager extends WebSocketServer {
         clients.remove(conn);
         System.out.println("Connection closed: " + conn.getRemoteSocketAddress());
     }
-
     // Khi xảy ra lỗi
     @Override
     public void onError(WebSocket conn, Exception ex) {
         System.err.println("Error occurred: " + ex.getMessage());
     }
-
     @Override
     public void onStart() {
         System.out.println("WebSocket server started!");
@@ -128,6 +119,12 @@ public class ServerManager extends WebSocketServer {
                         null,
                         null));
                 System.out.println("Player mới được đăng ký: " + namePlayer);
+                String dataNameJoin = "Người chơi mới " + namePlayer;
+                String dataJoin = " đã gia nhập server";
+
+                // Gửi phản hồi PacketType 18 đến tất cả client
+                RequestPacket response = new RequestPacket(18, dataNameJoin, dataJoin);
+                broadcastMessage(response);
             }
         }
 
@@ -171,7 +168,8 @@ public class ServerManager extends WebSocketServer {
                 info.setDayPlayer(dayPlay);
                 info.setSoldierData(packet.getSoldierData());
                 System.out.println("Ngày chơi được lưu: " + dayPlay +
-                        " cho player: " + info.getNamePlayer());
+                        " cho player: " + info.getNamePlayer() +
+                        " asset: " + info.getSoldierData());
             } else {
                 System.err.println("Player chưa đăng ký, không thể lưu ngày chơi!");
             }
@@ -188,7 +186,7 @@ public class ServerManager extends WebSocketServer {
                 if (info.getDayPlayer() != null) {
                     try {
                         int days = Integer.parseInt(info.getDayPlayer());
-                        if (days >= 30) {
+                        if (days >= 10) {
                             InfoPlayer player = new InfoPlayer(info.getIpPlayer(), info.getNamePlayer(), String.valueOf(days), info.getSoldierData());
                             activePlayers.add(player);
                         }
@@ -219,7 +217,20 @@ public class ServerManager extends WebSocketServer {
         broadcastMessage(response);
         System.out.println("Tin nhắn từ player: " + namePlayer + ", Nội dung: " + messagePlayer);
     }
+    private void handleMessagePlayerJoinServer(WebSocket conn, RequestPacket packet) {
+        String namePlayer = packet.getNamePlayer();
+        String messagePlayer = packet.getMessagePlayer();
 
+        if (namePlayer == null || namePlayer.isEmpty() || messagePlayer == null || messagePlayer.isEmpty()) {
+            System.err.println("Thông tin tin nhắn không hợp lệ!");
+            return;
+        }
+
+        // Gửi phản hồi PacketType 18 đến tất cả client
+        RequestPacket response = new RequestPacket(18, namePlayer, messagePlayer);
+        broadcastMessage(response);
+        System.out.println("Tin nhắn từ player: " + namePlayer + ", Nội dung: " + messagePlayer);
+    }
     public void ResponseDataToClient(WebSocket conn, RequestPacket packet) {
         conn.send(RequestPacket.toJson(packet));
     }

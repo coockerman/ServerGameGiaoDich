@@ -13,8 +13,8 @@ public class ShopHandel {
     public ShopHandel() {
         // Khởi tạo tài nguyên với số lượng, giá mua, giá bán, số lượng mặc định và tốc độ điều chỉnh giá
         this.gold = new Resource(200, 150, 120, 200, 0.3f);
-        this.iron = new Resource(500, 30, 24, 500, 0.1f);
-        this.food = new Resource(5000, 5, 4, 5000, 0.03f);
+        this.iron = new Resource(1000, 30, 24, 1000, 0.1f);
+        this.food = new Resource(10000, 5, 4, 10000, 0.03f);
     }
 
     public RequestPacket HandelBuyByClient(AbstractData requestByClient) {

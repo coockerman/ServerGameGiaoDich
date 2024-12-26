@@ -35,4 +35,12 @@ public class SoldierData {
     public void setCavalry(float cavalry) {
         Cavalry = cavalry;
     }
+    @Override
+    public String toString() {
+        return "SoldierData{" +
+                "Melee=" + Melee +
+                ", Arrow=" + Arrow +
+                ", Cavalry=" + Cavalry +
+                '}';
+    }
 }
