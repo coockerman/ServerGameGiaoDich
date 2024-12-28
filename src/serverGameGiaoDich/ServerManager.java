@@ -1,5 +1,10 @@
 package serverGameGiaoDich;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -15,10 +20,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class ServerManager extends WebSocketServer {
 
-    // <editor-fold desc="Tạm ẩn các thuộc tính">
+    MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
+
     private final Map<WebSocket, InfoPlayer> playerInfoMap = new ConcurrentHashMap<>();
     private ShopHandel shop = new ShopHandel();
-    // </editor-fold>
     public ServerManager(int port) {
         super(new InetSocketAddress(port));
     }
@@ -99,6 +104,7 @@ public class ServerManager extends WebSocketServer {
     }
 
     // Xử lý đăng ký tên player
+    // Xử lý đăng ký tên player và ghi vào MongoDB
     private void handleRegisterPlayer(WebSocket conn, RequestPacket packet) {
         String namePlayer = packet.getNamePlayer();
 
@@ -119,19 +125,32 @@ public class ServerManager extends WebSocketServer {
                         null,
                         null));
                 System.out.println("Player mới được đăng ký: " + namePlayer);
+
+                // Ghi thông tin player vào MongoDB
+                Document playerDoc = new Document("name", namePlayer)
+                        .append("ip", conn.getRemoteSocketAddress().getAddress().getHostAddress())
+                        .append("status", "active"); // Thêm các thuộc tính khác nếu cần
+
+                MongoDatabase database = mongoClient.getDatabase("testdb");
+                MongoCollection<Document> playersCollection = database.getCollection("player");
+
+                // Chèn tài liệu vào MongoDB
+                playersCollection.insertOne(playerDoc);
+                System.out.println("Đã ghi thông tin player vào MongoDB: " + namePlayer);
+
+                // Gửi phản hồi PacketType 18 đến tất cả client
                 String dataNameJoin = "Người chơi mới " + namePlayer;
                 String dataJoin = " đã gia nhập server";
 
-                // Gửi phản hồi PacketType 18 đến tất cả client
                 RequestPacket response = new RequestPacket(18, dataNameJoin, dataJoin);
                 broadcastMessage(response);
+
                 // Gửi phản hồi PacketType 19
                 sendPlayerRegistrationResponse(conn, namePlayer, true);
             }
         }
-
-
     }
+
 
     // Gửi phản hồi đăng ký player về client
     private void sendPlayerRegistrationResponse(WebSocket conn, String namePlayer, boolean status) {
