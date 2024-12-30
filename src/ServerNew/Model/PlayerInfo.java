@@ -3,16 +3,31 @@ package ServerNew.Model;
 import org.java_websocket.WebSocket;
 
 public class PlayerInfo {
-    private WebSocket socket;
+
+    private String userName;
+    private String namePlayer;
 
     public PlayerInfo() {
     }
 
-    public WebSocket getSocket() {
-        return socket;
+    public PlayerInfo(String namePlayer, String userName) {
+        this.namePlayer = namePlayer;
+        this.userName = userName;
     }
 
-    public void setSocket(WebSocket socket) {
-        this.socket = socket;
+    public String getNamePlayer() {
+        return namePlayer;
+    }
+
+    public void setNamePlayer(String namePlayer) {
+        this.namePlayer = namePlayer;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }
