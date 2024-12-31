@@ -3,6 +3,7 @@ package ServerNew.Controller;
 import ServerNew.Model.Resource;
 import ServerNew.Model.Shop;
 import ServerNew.Packet.RequestPacket;
+import ServerNew.Packet.ResponsePacket;
 import com.mongodb.client.MongoClient;
 
 
@@ -22,6 +23,16 @@ public class ShopController {
             case 2: return shop.getFood();
             default: return null;
         }
+    }
+    public ResponsePacket getDataShop() {
+        return shop.HandelUpdatePriceStore();
+    }
+    public Shop getShop() {
+        return shop;
+    }
+
+    public void setShop(Shop shop) {
+        this.shop = shop;
     }
 }
 

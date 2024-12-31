@@ -1,4 +1,4 @@
-package serverGameGiaoDich.Trade;
+package ServerNew.Model;
 
 public class UpdateStoreData{
     public Item itemGold;

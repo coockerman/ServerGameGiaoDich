@@ -89,10 +89,18 @@ public class ServerManager extends WebSocketServer {
                     break;
 
                 case TypeRequest.REGISTER_NAME:
-                    PlayerInfo playerInfo = getRequest.getPlayerInfo();
+                    PlayerInfo playerInfoRegisterName = getRequest.getPlayerInfo();
                     System.out.println("Đăng kí tên");
-                    ResponseDataToClient(webSocket, playerController.RegisterName(playerInfo));
+                    ResponseDataToClient(webSocket, playerController.RegisterName(playerInfoRegisterName));
                     break;
+
+                case TypeRequest.GET_ALL_DATA_PLAYER:
+                    PlayerInfo playerInfoGetAllData = getRequest.getPlayerInfo();
+                    System.out.println("Lấy tất cả thông tin người chơi");
+                    ResponseDataToClient(webSocket, playerController.GetAllDataPlayer(playerInfoGetAllData));
+                    ResponseDataToClient(webSocket, shopController.getDataShop());
+                    break;
+
 
                 default:
                     System.err.println("Chưa có hàm xử lý yêu cầu này!!!");

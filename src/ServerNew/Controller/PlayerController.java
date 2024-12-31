@@ -41,4 +41,23 @@ public class PlayerController {
             return new ResponsePacket(TypeResponse.RESPONSE_REGISTER_NAME_FALSE, "Lỗi: " + e.getMessage());
         }
     }
+
+    public ResponsePacket GetAllDataPlayer(PlayerInfo playerInfo) {
+        try {
+            System.out.println(playerInfo.getUserName() + " " + playerInfo.getNamePlayer());
+            // Tìm thông tin người chơi trong cơ sở dữ liệu
+            Document existingPlayer = collectionPlayerInfo.find(Filters.eq("username", playerInfo.getUserName())).first();
+            if (existingPlayer == null) {
+                return new ResponsePacket(TypeResponse.RESPONSE_GET_DATA_PLAYER, "Người chơi không tồn tại");
+            }
+
+            PlayerInfo dataPlayer = PlayerInfo.fromDocument(existingPlayer);
+
+
+            return new ResponsePacket(TypeResponse.RESPONSE_GET_DATA_PLAYER, "Lấy dữ liệu người chơi thành công", dataPlayer);
+        } catch (Exception e) {
+            return new ResponsePacket(TypeResponse.RESPONSE_GET_DATA_PLAYER, "Lỗi lấy dữ liệu: " + e.getMessage());
+        }
+    }
+
 }

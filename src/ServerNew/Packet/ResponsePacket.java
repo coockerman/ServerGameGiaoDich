@@ -1,13 +1,13 @@
 package ServerNew.Packet;
 
 import ServerNew.Model.PlayerInfo;
-import ServerNew.Model.Shop;
+import ServerNew.Model.UpdateStoreData;
 
 public class ResponsePacket {
     private String typeResponse;
     private String callbackResult;
     private PlayerInfo playerInfo;
-    private Shop shop;
+    private UpdateStoreData updateStoreData;
 
     public ResponsePacket(String typeResponse, String callbackResult) {
         this.typeResponse = typeResponse;
@@ -20,10 +20,17 @@ public class ResponsePacket {
         this.playerInfo = playerInfo;
     }
 
-    public ResponsePacket(String typeResponse, String callbackResult, Shop shop) {
+    public ResponsePacket(String typeResponse, String callbackResult, UpdateStoreData updateStoreData) {
         this.typeResponse = typeResponse;
         this.callbackResult = callbackResult;
-        this.shop = shop;
+        this.updateStoreData = updateStoreData;
+    }
+
+    public ResponsePacket(String typeResponse, String callbackResult, PlayerInfo playerInfo, UpdateStoreData updateStoreData) {
+        this.typeResponse = typeResponse;
+        this.callbackResult = callbackResult;
+        this.playerInfo = playerInfo;
+        this.updateStoreData = updateStoreData;
     }
 
     public String getTypeResponse() {
@@ -50,11 +57,11 @@ public class ResponsePacket {
         this.playerInfo = playerInfo;
     }
 
-    public Shop getShop() {
-        return shop;
+    public UpdateStoreData getUpdateStoreData() {
+        return updateStoreData;
     }
 
-    public void setShop(Shop shop) {
-        this.shop = shop;
+    public void setUpdateStoreData(UpdateStoreData updateStoreData) {
+        this.updateStoreData = updateStoreData;
     }
 }

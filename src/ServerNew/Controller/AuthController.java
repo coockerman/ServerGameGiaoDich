@@ -3,6 +3,7 @@ package ServerNew.Controller;
 import ServerNew.Model.AssetData;
 import ServerNew.Model.AuthData;
 import ServerNew.Model.BuildData;
+import ServerNew.Model.PlayerInfo;
 import ServerNew.Packet.ResponsePacket;
 import ServerNew.Packet.Trade.TypeResponse;
 import ServerNew.Utils.JsonUtils;
@@ -11,6 +12,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.java_websocket.WebSocket;
+import serverGameGiaoDich.Trade.InfoPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +44,15 @@ public class AuthController {
                 .append("status", true);
         collectionAuth.insertOne(newPlayer);
 
-        Document newInfoPlayer = new Document("username", newAuthData.getUserName())
-                .append("ipPlayer", newAuthData.getSocket().getRemoteSocketAddress().toString())
-                .append("namePlayer", "default")
-                .append("dayPlayer", 0)
-                .append("assetData", new AssetData())
-                .append("buildData", new BuildData())
-                .append("listInfoPK", null);
+        PlayerInfo playerInfoInit = new PlayerInfo(newAuthData.getUserName(),
+                newAuthData.getSocket().getRemoteSocketAddress().toString(),
+                "default",
+                0,
+                new AssetData(),
+                new BuildData()
+        );
+        //Init asset new player
+        Document newInfoPlayer = PlayerInfo.ToDocument(playerInfoInit);
         collectionPlayerInfo.insertOne(newInfoPlayer);
 
         playerInfoMap.add(newAuthData);

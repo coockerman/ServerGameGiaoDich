@@ -15,6 +15,9 @@ public class TypeResponse {
 
     public static final String RESPONSE_ERROR = "responseError";
 
+    public static final String RESPONSE_GET_DATA_PLAYER = "responseGetDataPlayer";
+    public static final String RESPONSE_GET_DATA_SHOP = "responseGetDataShop";
+
     public static final String RESPONSE_BUY = "responseBuy";
     public static final String RESPONSE_SELL = "responseSell";
 
