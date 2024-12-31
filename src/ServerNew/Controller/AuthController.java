@@ -1,8 +1,11 @@
 package ServerNew.Controller;
 
+import ServerNew.Model.AssetData;
 import ServerNew.Model.AuthData;
+import ServerNew.Model.BuildData;
 import ServerNew.Packet.ResponsePacket;
 import ServerNew.Packet.Trade.TypeResponse;
+import ServerNew.Utils.JsonUtils;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -43,8 +46,8 @@ public class AuthController {
                 .append("ipPlayer", newAuthData.getSocket().getRemoteSocketAddress().toString())
                 .append("namePlayer", "default")
                 .append("dayPlayer", 0)
-                .append("assetData", null)
-                .append("buildData", null)
+                .append("assetData", new AssetData())
+                .append("buildData", new BuildData())
                 .append("listInfoPK", null);
         collectionPlayerInfo.insertOne(newInfoPlayer);
 

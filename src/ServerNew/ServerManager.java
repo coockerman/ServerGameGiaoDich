@@ -1,6 +1,7 @@
 package ServerNew;
 
 import ServerNew.Controller.AuthController;
+import ServerNew.Controller.PlayerController;
 import ServerNew.Controller.ShopController;
 import ServerNew.Model.AuthData;
 import ServerNew.Model.PlayerInfo;
@@ -24,12 +25,14 @@ public class ServerManager extends WebSocketServer {
     private MongoClient mongoClient;
     private ShopController shopController;
     private AuthController authController;
+    private PlayerController playerController;
 
     public ServerManager(int port) {
         super(new InetSocketAddress(port));
         mongoClient = MongoClients.create("mongodb://localhost:27017");
         shopController = new ShopController(mongoClient);
         authController = new AuthController(mongoClient);
+        playerController = new PlayerController(mongoClient);
     }
 
     @Override
@@ -81,12 +84,14 @@ public class ServerManager extends WebSocketServer {
 
                 case TypeRequest.LOGOUT_PLAYER:
                     AuthData authDataLogout = getRequest.getAuthData();
+                    System.out.println("Đăng xuất");
                     ResponseDataToClient(webSocket, authController.LogoutPlayer(authDataLogout));
                     break;
 
                 case TypeRequest.REGISTER_NAME:
                     PlayerInfo playerInfo = getRequest.getPlayerInfo();
-                    ResponseDataToClient(webSocket, authController.LogoutPlayer(authDataLogout));
+                    System.out.println("Đăng kí tên");
+                    ResponseDataToClient(webSocket, playerController.RegisterName(playerInfo));
                     break;
 
                 default:
