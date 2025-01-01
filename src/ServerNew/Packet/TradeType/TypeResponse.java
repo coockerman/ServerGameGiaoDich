@@ -1,4 +1,4 @@
-package ServerNew.Packet.Trade;
+package ServerNew.Packet.TradeType;
 
 public class TypeResponse {
     public static final String RESPONSE_REGISTER_FALSE = "responseRegisterFalse";

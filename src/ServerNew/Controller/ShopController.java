@@ -1,19 +1,33 @@
 package ServerNew.Controller;
 
+import ServerNew.Model.MongoModel.AssetData;
 import ServerNew.Model.Resource;
 import ServerNew.Model.Shop;
+import ServerNew.Model.Trade;
 import ServerNew.Packet.RequestPacket;
 import ServerNew.Packet.ResponsePacket;
+import ServerNew.Packet.TradeType.TypeObject;
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import org.bson.Document;
+
+import java.util.List;
+import java.util.Objects;
 
 
 public class ShopController {
     private Shop shop;
     private MongoClient mongoClient;
+    private MongoCollection<Document> collectionPlayerInfo;
 
     public ShopController(MongoClient mongoClient) {
         shop = new Shop();
         this.mongoClient = mongoClient;
+        MongoDatabase database = mongoClient.getDatabase("GameDatabase");
+        this.collectionPlayerInfo = database.getCollection("playerInfo");
     }
 
     private Resource getResourceByType(int itemType) {
@@ -24,9 +38,65 @@ public class ShopController {
             default: return null;
         }
     }
+
     public ResponsePacket getDataShop() {
         return shop.HandelUpdatePriceStore();
     }
+
+    public boolean CheckBuy(Trade trade) {
+        Document query = new Document("username", trade.getUsername());
+        System.out.println(trade.getUsername());
+        Document result = collectionPlayerInfo.find(query).first();
+        if(result == null) {
+            System.out.println("ko tìm thấy trong cơ sở dữ liệu");
+            return false;
+        }
+        Document resultAsset = (Document)result.get("assetData");
+        AssetData assetData = AssetData.fromDocument(resultAsset);
+        int countBuy = trade.getCount();
+        int money = assetData.getCountMoney();
+
+        // Lấy thông tin mặt hàng
+        Resource resource = null;
+        String type = trade.getTypeItem();
+        if (Objects.equals(type, TypeObject.FOOD)) {
+            resource = shop.getFood();
+        } else if (Objects.equals(type, TypeObject.IRON)) {
+            resource = shop.getIron();
+        } else if (Objects.equals(type, TypeObject.GOLD)) {
+            resource = shop.getGold();
+        }
+
+        // Kiểm tra mặt hàng hợp lệ
+        if (resource == null || countBuy > resource.getQuantity()) {
+            return false;
+        }
+
+        // Tính toán giá và số lượng
+        int price = (int) resource.getPriceBuy();
+        int needMoney = price * countBuy;
+        int countHave = assetData.getAssetCountByType(type);
+
+        if (money >= needMoney) {
+            money -= needMoney;
+            countHave += countBuy;
+            resource.decreaseQuantity(countBuy);
+            // Cập nhật dữ liệu trong database
+            collectionPlayerInfo.updateMany(
+                    Filters.eq("username", trade.getUsername()),
+                    Updates.combine(
+                            Updates.set("assetData.countMoney", money),
+                            Updates.set("assetData.assets.$[elem].count", countHave)
+                    ),
+                    new com.mongodb.client.model.UpdateOptions().arrayFilters(
+                            List.of(Filters.eq("elem.type", type))
+                    )
+            );
+            return true;
+        }
+        return false;
+    }
+
     public Shop getShop() {
         return shop;
     }
@@ -35,4 +105,3 @@ public class ShopController {
         this.shop = shop;
     }
 }
-

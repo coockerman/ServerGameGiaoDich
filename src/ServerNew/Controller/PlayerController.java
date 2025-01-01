@@ -1,14 +1,16 @@
 package ServerNew.Controller;
 
-import ServerNew.Model.PlayerInfo;
+import ServerNew.Model.MongoModel.PlayerInfo;
+import ServerNew.Model.Trade;
 import ServerNew.Packet.ResponsePacket;
-import ServerNew.Packet.Trade.TypeResponse;
+import ServerNew.Packet.TradeType.TypeResponse;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import org.bson.Document;
+import org.java_websocket.WebSocket;
 
 public class PlayerController {
     private MongoCollection<Document> collectionPlayerInfo;
@@ -47,6 +49,23 @@ public class PlayerController {
             System.out.println(playerInfo.getUserName() + " " + playerInfo.getNamePlayer());
             // Tìm thông tin người chơi trong cơ sở dữ liệu
             Document existingPlayer = collectionPlayerInfo.find(Filters.eq("username", playerInfo.getUserName())).first();
+            if (existingPlayer == null) {
+                return new ResponsePacket(TypeResponse.RESPONSE_GET_DATA_PLAYER, "Người chơi không tồn tại");
+            }
+
+            PlayerInfo dataPlayer = PlayerInfo.fromDocument(existingPlayer);
+
+
+            return new ResponsePacket(TypeResponse.RESPONSE_GET_DATA_PLAYER, "Lấy dữ liệu người chơi thành công", dataPlayer);
+        } catch (Exception e) {
+            return new ResponsePacket(TypeResponse.RESPONSE_GET_DATA_PLAYER, "Lỗi lấy dữ liệu: " + e.getMessage());
+        }
+    }
+    public ResponsePacket GetAllDataPlayer(Trade trade) {
+        try {
+            System.out.println(trade.getUsername() + " lấy dữ liệu người chơi");
+            // Tìm thông tin người chơi trong cơ sở dữ liệu
+            Document existingPlayer = collectionPlayerInfo.find(Filters.eq("username", trade.getUsername())).first();
             if (existingPlayer == null) {
                 return new ResponsePacket(TypeResponse.RESPONSE_GET_DATA_PLAYER, "Người chơi không tồn tại");
             }

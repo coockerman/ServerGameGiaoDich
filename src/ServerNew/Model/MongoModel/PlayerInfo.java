@@ -1,7 +1,6 @@
-package ServerNew.Model;
+package ServerNew.Model.MongoModel;
 
 import org.bson.Document;
-import org.java_websocket.WebSocket;
 
 public class PlayerInfo {
 

@@ -1,4 +1,4 @@
-package ServerNew.Model;
+package ServerNew.Model.MongoModel;
 
 import org.java_websocket.WebSocket;
 

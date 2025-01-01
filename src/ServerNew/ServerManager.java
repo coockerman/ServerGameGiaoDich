@@ -3,12 +3,13 @@ package ServerNew;
 import ServerNew.Controller.AuthController;
 import ServerNew.Controller.PlayerController;
 import ServerNew.Controller.ShopController;
-import ServerNew.Model.AuthData;
-import ServerNew.Model.PlayerInfo;
+import ServerNew.Model.MongoModel.AuthData;
+import ServerNew.Model.MongoModel.PlayerInfo;
+import ServerNew.Model.Trade;
 import ServerNew.Packet.RequestPacket;
 import ServerNew.Packet.ResponsePacket;
-import ServerNew.Packet.Trade.TypeRequest;
-import ServerNew.Packet.Trade.TypeResponse;
+import ServerNew.Packet.TradeType.TypeRequest;
+import ServerNew.Packet.TradeType.TypeResponse;
 import ServerNew.Utils.JsonUtils;
 
 import com.mongodb.client.MongoClient;
@@ -60,14 +61,6 @@ public class ServerManager extends WebSocketServer {
 
         if(getRequest!=null) {
             switch (getRequest.getTypeRequest()) {
-                case TypeRequest.BUY:
-                    //Todo buy
-                    break;
-
-                case TypeRequest.SELL:
-                    //Todo sell
-                    break;
-
                 case TypeRequest.REGISTER_NEW_PLAYER:
                     AuthData authDataRegister = getRequest.getAuthData();
                     authDataRegister.setSocket(webSocket);
@@ -101,6 +94,21 @@ public class ServerManager extends WebSocketServer {
                     ResponseDataToClient(webSocket, shopController.getDataShop());
                     break;
 
+                case TypeRequest.BUY:
+                    Trade trade = getRequest.getTrade();
+                    System.out.println("Mua");
+                    if(shopController.CheckBuy(trade)) {
+                        ResponseDataToClient(webSocket, playerController.GetAllDataPlayer(trade));
+                        broadcastMessage(shopController.getDataShop());
+                    }else{
+                        //Todo Buy false
+                    }
+
+                    break;
+
+                case TypeRequest.SELL:
+                    //Todo sell
+                    break;
 
                 default:
                     System.err.println("Chưa có hàm xử lý yêu cầu này!!!");
@@ -136,6 +144,7 @@ public class ServerManager extends WebSocketServer {
         for (AuthData conn : authController.getPlayerInfoMap()) {
             WebSocket socket = conn.getSocket();
             if (socket != null && socket.isOpen()) {
+                System.out.println("Đã gửi dữ liệu shop cho: " + socket.getRemoteSocketAddress());
                 socket.send(JsonUtils.toJson(packet));
             }
         }

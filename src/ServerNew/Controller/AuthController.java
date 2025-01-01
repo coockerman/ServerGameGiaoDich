@@ -1,18 +1,16 @@
 package ServerNew.Controller;
 
-import ServerNew.Model.AssetData;
-import ServerNew.Model.AuthData;
-import ServerNew.Model.BuildData;
-import ServerNew.Model.PlayerInfo;
+import ServerNew.Model.MongoModel.AssetData;
+import ServerNew.Model.MongoModel.AuthData;
+import ServerNew.Model.MongoModel.BuildData;
+import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Packet.ResponsePacket;
-import ServerNew.Packet.Trade.TypeResponse;
-import ServerNew.Utils.JsonUtils;
+import ServerNew.Packet.TradeType.TypeResponse;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.java_websocket.WebSocket;
-import serverGameGiaoDich.Trade.InfoPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +77,7 @@ public class AuthController {
             System.out.println("Người dùng này đã online!");
             return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_FALSE, "Người dùng này đã online!");
         }
-
+        updateIpPlayer(loginAuthData.getUserName(), loginAuthData.getSocket().getRemoteSocketAddress().toString());
         updatePlayerStatus(loginAuthData.getUserName(), true);
         playerInfoMap.add(loginAuthData);
         System.out.println("Đăng nhập thành công!");
@@ -90,6 +88,11 @@ public class AuthController {
         Document query = new Document("username", username);
         Document update = new Document("$set", new Document("status", status));
         collectionAuth.updateOne(query, update);
+    }
+    private void updateIpPlayer(String username, String ip) {
+        Document query = new Document("username", username);
+        Document update = new Document("$set", new Document("ipPlayer", ip));
+        collectionPlayerInfo.updateOne(query, update);
     }
 
     public ResponsePacket LogoutPlayer(AuthData logoutAuthData) {

@@ -1,7 +1,7 @@
 package ServerNew.Model;
 
 import ServerNew.Packet.ResponsePacket;
-import ServerNew.Packet.Trade.TypeResponse;
+import ServerNew.Packet.TradeType.TypeResponse;
 
 public class Shop {
     private Resource gold;

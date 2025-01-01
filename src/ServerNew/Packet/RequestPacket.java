@@ -1,12 +1,14 @@
 package ServerNew.Packet;
 
-import ServerNew.Model.AuthData;
-import ServerNew.Model.PlayerInfo;
+import ServerNew.Model.MongoModel.AuthData;
+import ServerNew.Model.MongoModel.PlayerInfo;
+import ServerNew.Model.Trade;
 
 public class RequestPacket {
     private String typeRequest;
     private AuthData authData;
     private PlayerInfo playerInfo;
+    private Trade trade;
 
     public RequestPacket() {
     }
@@ -34,5 +36,13 @@ public class RequestPacket {
 
     public void setPlayerInfo(PlayerInfo playerInfo) {
         this.playerInfo = playerInfo;
+    }
+
+    public Trade getTrade() {
+        return trade;
+    }
+
+    public void setTrade(Trade trade) {
+        this.trade = trade;
     }
 }

@@ -1,4 +1,4 @@
-package ServerNew.Packet.Trade;
+package ServerNew.Packet.TradeType;
 
 public class TypeObject {
     public static final String FOOD = "food";

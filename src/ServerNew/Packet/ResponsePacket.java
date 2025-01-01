@@ -1,6 +1,6 @@
 package ServerNew.Packet;
 
-import ServerNew.Model.PlayerInfo;
+import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Model.UpdateStoreData;
 
 public class ResponsePacket {
