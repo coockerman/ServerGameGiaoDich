@@ -1,7 +1,9 @@
-package ServerNew.Model;
+package ServerNew.Model.Shop;
 
+import ServerNew.Model.UpdateStore.Item;
+import ServerNew.Model.UpdateStore.UpdateStoreData;
 import ServerNew.Packet.ResponsePacket;
-import ServerNew.Packet.TradeType.TypeResponse;
+import ServerNew.Packet.ManagerType.TypeResponse;
 
 public class Shop {
     private Resource gold;

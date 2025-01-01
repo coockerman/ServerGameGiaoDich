@@ -90,7 +90,7 @@ public class PlayerInfo {
         String ipPlayer = document.getString("ipPlayer");
         String namePlayer = document.getString("namePlayer");
         int dayPlayer = document.getInteger("dayPlayer", 0); // Default to 0 if not present
-        AssetData assetData = AssetData.fromDocument((Document) document.get("assetData"));
+        AssetData assetData = AssetData.FromDocument((Document) document.get("assetData"));
         BuildData buildData = BuildData.FromDocument((Document) document.get("buildData"));
 
         // Returning a new PlayerInfo instance with the extracted values

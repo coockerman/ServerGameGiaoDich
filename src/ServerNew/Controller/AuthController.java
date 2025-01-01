@@ -5,7 +5,7 @@ import ServerNew.Model.MongoModel.AuthData;
 import ServerNew.Model.MongoModel.BuildData;
 import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Packet.ResponsePacket;
-import ServerNew.Packet.TradeType.TypeResponse;
+import ServerNew.Packet.ManagerType.TypeResponse;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;

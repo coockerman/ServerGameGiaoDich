@@ -1,4 +1,4 @@
-package ServerNew.Packet.TradeType;
+package ServerNew.Packet.ManagerType;
 
 public class TypeResponse {
     public static final String RESPONSE_REGISTER_FALSE = "responseRegisterFalse";
@@ -18,8 +18,7 @@ public class TypeResponse {
     public static final String RESPONSE_GET_DATA_PLAYER = "responseGetDataPlayer";
     public static final String RESPONSE_GET_DATA_SHOP = "responseGetDataShop";
 
-    public static final String RESPONSE_BUY = "responseBuy";
-    public static final String RESPONSE_SELL = "responseSell";
+
 
 
 }

@@ -1,9 +1,9 @@
 package serverGameGiaoDich;
 
 import serverGameGiaoDich.Trade.AbstractData;
-import ServerNew.Model.Item;
+import ServerNew.Model.UpdateStore.Item;
 import serverGameGiaoDich.Trade.RequestPacket;
-import ServerNew.Model.UpdateStoreData;
+import ServerNew.Model.UpdateStore.UpdateStoreData;
 
 public class ShopHandel {
     private Resource gold;

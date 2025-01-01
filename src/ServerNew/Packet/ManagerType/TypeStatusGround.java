@@ -1,4 +1,4 @@
-package ServerNew.Packet.TradeType;
+package ServerNew.Packet.ManagerType;
 
 public class TypeStatusGround {
     public static final String NOT_OPEN = "notOpen";

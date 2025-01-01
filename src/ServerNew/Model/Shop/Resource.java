@@ -1,4 +1,4 @@
-package ServerNew.Model;
+package ServerNew.Model.Shop;
 
 public class Resource {
     private int quantity;

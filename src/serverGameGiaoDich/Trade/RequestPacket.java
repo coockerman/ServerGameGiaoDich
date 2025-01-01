@@ -1,6 +1,6 @@
 package serverGameGiaoDich.Trade;
 
-import ServerNew.Model.UpdateStoreData;
+import ServerNew.Model.UpdateStore.UpdateStoreData;
 import com.google.gson.Gson;
 
 import java.util.List;

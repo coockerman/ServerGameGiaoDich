@@ -1,7 +1,6 @@
 package ServerNew.Model.MongoModel;
 
-import ServerNew.Packet.TradeType.TypeObject;
-import ServerNew.Packet.TradeType.TypeStatusGround;
+import ServerNew.Packet.ManagerType.TypeStatusGround;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -23,8 +22,16 @@ public class BuildData {
         this.comboBuilders.add(new ComboBuilder(8, null, TypeStatusGround.NOT_OPEN));
         this.comboBuilders.add(new ComboBuilder(9, null, TypeStatusGround.NOT_OPEN));
         this.comboBuilders.add(new ComboBuilder(10, null, TypeStatusGround.NOT_OPEN));
-        this.comboBuilders.add(new ComboBuilder(11, null, TypeStatusGround.NOT_OPEN));
     }
+
+    public List<ComboBuilder> getComboBuilders() {
+        return comboBuilders;
+    }
+
+    public void setComboBuilders(List<ComboBuilder> comboBuilders) {
+        this.comboBuilders = comboBuilders;
+    }
+
     // Convert BuildData to MongoDB Document
     public static Document ToDocument(BuildData buildData) {
         List<Document> comboBuilderDocs = new ArrayList<>();
@@ -38,6 +45,7 @@ public class BuildData {
     // Convert MongoDB Document to BuildData
     public static BuildData FromDocument(Document document) {
         BuildData buildData = new BuildData();
+        buildData.comboBuilders = new ArrayList<>();
         List<Document> comboBuilderDocs = (List<Document>) document.get("comboBuilders");
         for (Document comboBuilderDoc : comboBuilderDocs) {
             buildData.comboBuilders.add(ComboBuilder.fromDocument(comboBuilderDoc));

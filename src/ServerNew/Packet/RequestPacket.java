@@ -1,5 +1,6 @@
 package ServerNew.Packet;
 
+import ServerNew.Model.Build.BuildGround;
 import ServerNew.Model.MongoModel.AuthData;
 import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Model.Trade;
@@ -9,6 +10,7 @@ public class RequestPacket {
     private AuthData authData;
     private PlayerInfo playerInfo;
     private Trade trade;
+    private BuildGround buildGround;
 
     public RequestPacket() {
     }
@@ -44,5 +46,13 @@ public class RequestPacket {
 
     public void setTrade(Trade trade) {
         this.trade = trade;
+    }
+
+    public BuildGround getBuildGround() {
+        return buildGround;
+    }
+
+    public void setBuildGround(BuildGround buildGround) {
+        this.buildGround = buildGround;
     }
 }

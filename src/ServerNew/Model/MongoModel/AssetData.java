@@ -1,6 +1,6 @@
 package ServerNew.Model.MongoModel;
 
-import ServerNew.Packet.TradeType.TypeObject;
+import ServerNew.Packet.ManagerType.TypeObject;
 import org.bson.Document;
 
 import java.util.ArrayList;
@@ -65,7 +65,7 @@ public class AssetData {
     }
 
     // Chuyển Document thành đối tượng
-    public static AssetData fromDocument(Document document) {
+    public static AssetData FromDocument(Document document) {
         int countMoney = document.getInteger("countMoney", 0);
         List<Document> assetDocs = (List<Document>) document.get("assets");
         List<ComboItem> assets = new ArrayList<>();

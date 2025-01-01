@@ -1,4 +1,4 @@
-package ServerNew.Model;
+package ServerNew.Model.UpdateStore;
 
 public class UpdateStoreData{
     public Item itemGold;

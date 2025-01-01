@@ -1,15 +1,17 @@
 package ServerNew;
 
 import ServerNew.Controller.AuthController;
+import ServerNew.Controller.GroundController;
 import ServerNew.Controller.PlayerController;
 import ServerNew.Controller.ShopController;
+import ServerNew.Model.Build.BuildGround;
 import ServerNew.Model.MongoModel.AuthData;
 import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Model.Trade;
 import ServerNew.Packet.RequestPacket;
 import ServerNew.Packet.ResponsePacket;
-import ServerNew.Packet.TradeType.TypeRequest;
-import ServerNew.Packet.TradeType.TypeResponse;
+import ServerNew.Packet.ManagerType.TypeRequest;
+import ServerNew.Packet.ManagerType.TypeResponse;
 import ServerNew.Utils.JsonUtils;
 
 import com.mongodb.client.MongoClient;
@@ -27,13 +29,14 @@ public class ServerManager extends WebSocketServer {
     private ShopController shopController;
     private AuthController authController;
     private PlayerController playerController;
-
+    private GroundController groundController;
     public ServerManager(int port) {
         super(new InetSocketAddress(port));
         mongoClient = MongoClients.create("mongodb://localhost:27017");
         shopController = new ShopController(mongoClient);
         authController = new AuthController(mongoClient);
         playerController = new PlayerController(mongoClient);
+        groundController = new GroundController(mongoClient);
     }
 
     @Override
@@ -95,10 +98,10 @@ public class ServerManager extends WebSocketServer {
                     break;
 
                 case TypeRequest.BUY:
-                    Trade trade = getRequest.getTrade();
+                    Trade tradeBuy = getRequest.getTrade();
                     System.out.println("Mua");
-                    if(shopController.CheckBuy(trade)) {
-                        ResponseDataToClient(webSocket, playerController.GetAllDataPlayer(trade));
+                    if(shopController.CheckBuy(tradeBuy)) {
+                        ResponseDataToClient(webSocket, playerController.GetAllDataPlayer(tradeBuy.getUsername()));
                         broadcastMessage(shopController.getDataShop());
                     }else{
                         //Todo Buy false
@@ -107,7 +110,26 @@ public class ServerManager extends WebSocketServer {
                     break;
 
                 case TypeRequest.SELL:
-                    //Todo sell
+                    Trade tradeSell = getRequest.getTrade();
+                    System.out.println("Bán");
+                    if(shopController.CheckSell(tradeSell)) {
+                        ResponseDataToClient(webSocket, playerController.GetAllDataPlayer(tradeSell.getUsername()));
+                        broadcastMessage(shopController.getDataShop());
+                    }else{
+                        //Todo Buy false
+                    }
+                    break;
+
+                case TypeRequest.OPEN_BUILD:
+                    BuildGround openBuildGround = getRequest.getBuildGround();
+
+                    if(groundController.CheckOpenBuild(openBuildGround)) {
+                        ResponseDataToClient(webSocket, playerController.GetAllDataPlayer(openBuildGround.getUsername()));
+                        System.out.println("Mở ô đất thành công");
+                    }else{
+                        System.out.println("Mở ô đất thất bại");
+                        //Todo Buy false
+                    }
                     break;
 
                 default:

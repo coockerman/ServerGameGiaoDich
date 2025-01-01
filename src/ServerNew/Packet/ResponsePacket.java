@@ -1,7 +1,7 @@
 package ServerNew.Packet;
 
 import ServerNew.Model.MongoModel.PlayerInfo;
-import ServerNew.Model.UpdateStoreData;
+import ServerNew.Model.UpdateStore.UpdateStoreData;
 
 public class ResponsePacket {
     private String typeResponse;
