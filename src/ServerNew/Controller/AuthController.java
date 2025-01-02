@@ -51,7 +51,7 @@ public class AuthController {
 
             PlayerInfo playerInfoInit = new PlayerInfo(newAuthData.getUserName(),
                     newAuthData.getSocket() != null ? newAuthData.getSocket().getRemoteSocketAddress().toString() : "Unknown",
-                    "default",
+                    newAuthData.getUserName(),
                     0,
                     new AssetData(),
                     new BuildData()

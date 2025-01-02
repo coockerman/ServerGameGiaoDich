@@ -15,7 +15,7 @@ public class CryptoUtil {
     public static String getValidKey(String key) throws Exception {
         byte[] keyBytes = key.getBytes("UTF-8");
         if (keyBytes.length < 16) {
-            keyBytes = Arrays.copyOf(keyBytes, 16); // Nếu khóa ngắn hơn 16 bytes, thêm các byte 0 vào cuối
+            keyBytes = Arrays.copyOf(keyBytes, 16);
         } else if (keyBytes.length > 16) {
             keyBytes = Arrays.copyOf(keyBytes, 16); // Nếu khóa dài hơn 16 bytes, cắt bớt
         }
