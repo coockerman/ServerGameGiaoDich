@@ -18,7 +18,7 @@ public class TypeResponse {
     public static final String RESPONSE_GET_DATA_PLAYER = "responseGetDataPlayer";
     public static final String RESPONSE_GET_DATA_SHOP = "responseGetDataShop";
 
-
+    public static final String RESPONSE_MESSAGE = "responseMessage";
 
 
 }

@@ -98,7 +98,7 @@ public class AuthController {
     public ResponsePacket LogoutPlayer(AuthData logoutAuthData) {
         if (logoutAuthData == null || logoutAuthData.getUserName() == null) {
             System.out.println("Dữ liệu ko hợp lệ");
-            return new ResponsePacket(TypeResponse.RESPONSE_LOGOUT_FALSE, "Dữ liệu không hợp lệ!");
+            return new ResponsePacket(TypeResponse.RESPONSE_LOGOUT_FALSE, "Dữ liệu bị trống!");
         }
 
         Document query = new Document("username", logoutAuthData.getUserName());

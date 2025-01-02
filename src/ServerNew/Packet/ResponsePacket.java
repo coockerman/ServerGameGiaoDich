@@ -1,5 +1,6 @@
 package ServerNew.Packet;
 
+import ServerNew.Model.ChatMessage;
 import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Model.UpdateStore.UpdateStoreData;
 
@@ -8,6 +9,7 @@ public class ResponsePacket {
     private String callbackResult;
     private PlayerInfo playerInfo;
     private UpdateStoreData updateStoreData;
+    private ChatMessage chatMessage;
 
     public ResponsePacket(String typeResponse, String callbackResult) {
         this.typeResponse = typeResponse;
@@ -31,6 +33,11 @@ public class ResponsePacket {
         this.callbackResult = callbackResult;
         this.playerInfo = playerInfo;
         this.updateStoreData = updateStoreData;
+    }
+
+    public ResponsePacket(String typeResponse, ChatMessage chatMessage) {
+        this.typeResponse = typeResponse;
+        this.chatMessage = chatMessage;
     }
 
     public String getTypeResponse() {
@@ -63,5 +70,13 @@ public class ResponsePacket {
 
     public void setUpdateStoreData(UpdateStoreData updateStoreData) {
         this.updateStoreData = updateStoreData;
+    }
+
+    public ChatMessage getChatMessage() {
+        return chatMessage;
+    }
+
+    public void setChatMessage(ChatMessage chatMessage) {
+        this.chatMessage = chatMessage;
     }
 }

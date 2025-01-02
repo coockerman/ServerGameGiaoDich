@@ -5,6 +5,7 @@ import ServerNew.Controller.GroundController;
 import ServerNew.Controller.PlayerController;
 import ServerNew.Controller.ShopController;
 import ServerNew.Model.Build.BuildGround;
+import ServerNew.Model.ChatMessage;
 import ServerNew.Model.MongoModel.AuthData;
 import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Model.Trade;
@@ -130,6 +131,35 @@ public class ServerManager extends WebSocketServer {
                         System.out.println("Mở ô đất thất bại");
                         //Todo Buy false
                     }
+                    break;
+
+                case TypeRequest.BUILDING:
+                    BuildGround buildingGround = getRequest.getBuildGround();
+
+                    if(groundController.CheckBuilding(buildingGround)) {
+                        ResponseDataToClient(webSocket, playerController.GetAllDataPlayer(buildingGround.getUsername()));
+                        System.out.println("Xây dựng thành công");
+                    }else{
+                        System.out.println("Xây dựng thất bại");
+                    }
+                    break;
+
+                case TypeRequest.CLEAN_BUILD:
+                    BuildGround cleanBuildGround = getRequest.getBuildGround();
+
+                    if(groundController.CheckCleanBuild(cleanBuildGround)) {
+                        ResponseDataToClient(webSocket, playerController.GetAllDataPlayer(cleanBuildGround.getUsername()));
+                        System.out.println("Phá huỷ thành công");
+                    }else{
+                        System.out.println("Phá huỷ thất bại");
+                    }
+                    break;
+
+                case TypeRequest.MESSAGE:
+                    ChatMessage chatGet = getRequest.getChatMessage();
+                    ResponsePacket response = new ResponsePacket(TypeResponse.RESPONSE_MESSAGE, chatGet);
+                    System.out.println("Gửi tin nhắn đến tất cả những người khác");
+                    broadcastMessage(response);
                     break;
 
                 default:

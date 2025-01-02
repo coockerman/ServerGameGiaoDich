@@ -1,6 +1,7 @@
 package ServerNew.Packet;
 
 import ServerNew.Model.Build.BuildGround;
+import ServerNew.Model.ChatMessage;
 import ServerNew.Model.MongoModel.AuthData;
 import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Model.Trade;
@@ -11,6 +12,7 @@ public class RequestPacket {
     private PlayerInfo playerInfo;
     private Trade trade;
     private BuildGround buildGround;
+    private ChatMessage chatMessage;
 
     public RequestPacket() {
     }
@@ -54,5 +56,13 @@ public class RequestPacket {
 
     public void setBuildGround(BuildGround buildGround) {
         this.buildGround = buildGround;
+    }
+
+    public ChatMessage getChatMessage() {
+        return chatMessage;
+    }
+
+    public void setChatMessage(ChatMessage chatMessage) {
+        this.chatMessage = chatMessage;
     }
 }
