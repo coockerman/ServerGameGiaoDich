@@ -4,9 +4,11 @@ import ServerNew.Model.MongoModel.AssetData;
 import ServerNew.Model.MongoModel.AuthData;
 import ServerNew.Model.MongoModel.BuildData;
 import ServerNew.Model.MongoModel.PlayerInfo;
+import ServerNew.Model.PasswordReset;
 import ServerNew.Packet.ResponsePacket;
 import ServerNew.Packet.ManagerType.TypeResponse;
 import ServerNew.Utils.CryptoUtil;
+import ServerNew.Utils.EmailUtil;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -108,7 +110,41 @@ public class AuthController {
         }
     }
 
+    public ResponsePacket PasswordReset(PasswordReset passwordResetData) {
+        if (passwordResetData == null || passwordResetData.getUsername().isEmpty() || passwordResetData.getPasswordOld().isEmpty()) {
+            System.out.println("Dữ liệu không hợp lệ");
+            return new ResponsePacket(TypeResponse.RESPONSE_PASSWORD_RESET_FALSE, "Dữ liệu không hợp lệ!");
+        }
 
+        Document query = new Document("username", passwordResetData.getUsername());
+        Document result = collectionAuth.find(query).first();
+
+        if (result == null) {
+            System.out.println("Sai tên người dùng hoặc mật khẩu!");
+            return new ResponsePacket(TypeResponse.RESPONSE_PASSWORD_RESET_FALSE, "Lỗi");
+        }
+
+        try {
+            // Giải mã mật khẩu
+            String decryptedPassword = CryptoUtil.decrypt(secretKey, result.getString("password"));
+
+            if (!decryptedPassword.equals(passwordResetData.getPasswordOld())) {
+                System.out.println("Sai mật khẩu!");
+                return new ResponsePacket(TypeResponse.RESPONSE_PASSWORD_RESET_FALSE, "Sai mật khẩu");
+            }
+
+            String encryptedPassword = CryptoUtil.encrypt(secretKey, passwordResetData.getPasswordNew());
+            Document update = new Document("$set", new Document("password", encryptedPassword));
+
+            collectionAuth.updateOne(query, update);
+
+            System.out.println("Đổi mật khẩu thành công");
+            return new ResponsePacket(TypeResponse.RESPONSE_PASSWORD_RESET_TRUE, "Đổi mật khẩu thành công");
+        } catch (Exception e) {
+            System.out.println("Lỗi xử lý mã hóa: " + e.getMessage());
+            return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_FALSE, "Lỗi xử lý dữ liệu!");
+        }
+    }
 
     private void updatePlayerStatus(String username, boolean status) {
         Document query = new Document("username", username);
@@ -173,7 +209,28 @@ public class AuthController {
         // Ghi log thông tin người dùng đã bị đăng xuất
         System.out.println("Buộc đăng xuất người dùng: " + logoutAuthData.getUserName());
     }
+    public void HandleSendEmailForgetPassword(AuthData authDataForgetPass) {
+        if (authDataForgetPass == null || authDataForgetPass.getUserName().isEmpty()) {
+            System.out.println("Dữ liệu không hợp lệ");
+            return;
+        }
 
+        Document query = new Document("username", authDataForgetPass.getUserName());
+        Document result = collectionAuth.find(query).first();
+
+        if (result == null) {
+            System.out.println("Ko tồn tại tài khoản!");
+            return;
+        }
+
+        try {
+            // Giải mã mật khẩu
+            String decryptedPassword = CryptoUtil.decrypt(secretKey, result.getString("password"));
+            EmailUtil.sendPasswordEmail(authDataForgetPass.getUserName(), decryptedPassword);
+        } catch (Exception e) {
+            System.out.println("Lỗi xử lý mã hóa: " + e.getMessage());
+        }
+    }
 
     public List<AuthData> getPlayerInfoMap() {
         return playerInfoMap;

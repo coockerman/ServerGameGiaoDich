@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="apache.commons.email2.javax" type="repository">
+    <properties maven-id="org.apache.commons:commons-email2-javax:2.0.0-M1" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/commons-email2-javax-2.0.0-M1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/commons-email2-core-2.0.0-M1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jakarta.mail-1.6.7.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jakarta.activation-1.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

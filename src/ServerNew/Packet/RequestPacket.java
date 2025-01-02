@@ -4,6 +4,7 @@ import ServerNew.Model.Build.BuildGround;
 import ServerNew.Model.ChatMessage;
 import ServerNew.Model.MongoModel.AuthData;
 import ServerNew.Model.MongoModel.PlayerInfo;
+import ServerNew.Model.PasswordReset;
 import ServerNew.Model.Trade;
 
 public class RequestPacket {
@@ -13,6 +14,7 @@ public class RequestPacket {
     private Trade trade;
     private BuildGround buildGround;
     private ChatMessage chatMessage;
+    private PasswordReset passwordReset;
 
     public RequestPacket() {
     }
@@ -64,5 +66,13 @@ public class RequestPacket {
 
     public void setChatMessage(ChatMessage chatMessage) {
         this.chatMessage = chatMessage;
+    }
+
+    public PasswordReset getPasswordReset() {
+        return passwordReset;
+    }
+
+    public void setPasswordReset(PasswordReset passwordReset) {
+        this.passwordReset = passwordReset;
     }
 }

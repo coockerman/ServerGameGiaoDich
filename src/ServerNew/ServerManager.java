@@ -1,13 +1,11 @@
 package ServerNew;
 
-import ServerNew.Controller.AuthController;
-import ServerNew.Controller.GroundController;
-import ServerNew.Controller.PlayerController;
-import ServerNew.Controller.ShopController;
+import ServerNew.Controller.*;
 import ServerNew.Model.Build.BuildGround;
 import ServerNew.Model.ChatMessage;
 import ServerNew.Model.MongoModel.AuthData;
 import ServerNew.Model.MongoModel.PlayerInfo;
+import ServerNew.Model.PasswordReset;
 import ServerNew.Model.Trade;
 import ServerNew.Packet.RequestPacket;
 import ServerNew.Packet.ResponsePacket;
@@ -31,6 +29,8 @@ public class ServerManager extends WebSocketServer {
     private AuthController authController;
     private PlayerController playerController;
     private GroundController groundController;
+    private DayController dayController;
+
     public ServerManager(int port) {
         super(new InetSocketAddress(port));
         mongoClient = MongoClients.create("mongodb://localhost:27017");
@@ -38,8 +38,17 @@ public class ServerManager extends WebSocketServer {
         authController = new AuthController(mongoClient);
         playerController = new PlayerController(mongoClient);
         groundController = new GroundController(mongoClient);
+        dayController = new DayController(mongoClient, new Runnable() {
+            @Override
+            public void run() {
+                ResponseUpDay();
+            }
+        });
     }
-
+    void ResponseUpDay() {
+        ResponsePacket responUpday = new ResponsePacket(TypeResponse.RESPONSE_UPDAY, "Đã qua ngày mới");
+        broadcastMessage(responUpday);
+    }
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         System.out.println("Connect: " + webSocket.getRemoteSocketAddress());
@@ -86,10 +95,22 @@ public class ServerManager extends WebSocketServer {
                     ResponseDataToClient(webSocket, authController.LogoutPlayer(authDataLogout));
                     break;
 
+                case TypeRequest.FORGET_PASSWORD:
+                    AuthData authDataForgetPass = getRequest.getAuthData();
+                    authController.HandleSendEmailForgetPassword(authDataForgetPass);
+                    System.out.println("Đã gửi thông tin quên mật khẩu");
+                    break;
+
                 case TypeRequest.REGISTER_NAME:
                     PlayerInfo playerInfoRegisterName = getRequest.getPlayerInfo();
                     System.out.println("Đăng kí tên");
                     ResponseDataToClient(webSocket, playerController.RegisterName(playerInfoRegisterName));
+                    break;
+
+                case TypeRequest.PASSWORD_RESET:
+                    PasswordReset passwordReset = getRequest.getPasswordReset();
+                    System.out.println("Đổi mật khẩu");
+                    ResponseDataToClient(webSocket, authController.PasswordReset(passwordReset));
                     break;
 
                 case TypeRequest.GET_ALL_DATA_PLAYER:
@@ -197,7 +218,7 @@ public class ServerManager extends WebSocketServer {
         for (AuthData conn : authController.getPlayerInfoMap()) {
             WebSocket socket = conn.getSocket();
             if (socket != null && socket.isOpen()) {
-                System.out.println("Đã gửi dữ liệu shop cho: " + socket.getRemoteSocketAddress());
+                System.out.println("Đã gửi dữ liệu cho: " + socket.getRemoteSocketAddress());
                 socket.send(JsonUtils.toJson(packet));
             }
         }

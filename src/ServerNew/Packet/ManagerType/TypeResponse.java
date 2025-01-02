@@ -13,6 +13,9 @@ public class TypeResponse {
     public static final String RESPONSE_REGISTER_NAME_TRUE = "responseRegisterNameTrue";
     public static final String RESPONSE_REGISTER_NAME_FALSE = "responseRegisterNameFalse";
 
+    public static final String RESPONSE_PASSWORD_RESET_TRUE = "responsePasswordResetTrue";
+    public static final String RESPONSE_PASSWORD_RESET_FALSE = "responsePasswordResetFalse";
+
     public static final String RESPONSE_ERROR = "responseError";
 
     public static final String RESPONSE_GET_DATA_PLAYER = "responseGetDataPlayer";
@@ -20,5 +23,5 @@ public class TypeResponse {
 
     public static final String RESPONSE_MESSAGE = "responseMessage";
 
-
+    public static final String RESPONSE_UPDAY = "responseUpday";
 }
