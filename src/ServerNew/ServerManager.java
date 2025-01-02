@@ -70,6 +70,7 @@ public class ServerManager extends WebSocketServer {
                     authDataRegister.setSocket(webSocket);
                     System.out.println("Đăng kí người chơi mới");
                     ResponseDataToClient(webSocket, authController.RegisterNewPlayer(authDataRegister));
+
                     break;
 
                 case TypeRequest.LOGIN_PLAYER:

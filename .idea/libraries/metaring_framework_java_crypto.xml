@@ -1,0 +1,25 @@
+<component name="libraryTable">
+  <library name="metaring.framework.java.crypto" type="repository">
+    <properties maven-id="com.metaring:framework-java-crypto:1.5.9" />
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/framework-java-crypto-1.5.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/framework-java-functionality-1.5.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/framework-java-lib-1.5.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/framework-java-impl-1.5.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/framework-java-model-1.5.9.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/calcite-linq4j-1.20.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/guava-19.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/gson-2.8.5.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/spring-context-5.1.9.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/spring-aop-5.1.9.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/spring-beans-5.1.9.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/spring-core-5.1.9.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/spring-jcl-5.1.9.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/spring-expression-5.1.9.RELEASE.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/ea-async-1.2.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.25.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

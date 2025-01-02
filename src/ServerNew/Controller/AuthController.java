@@ -6,6 +6,7 @@ import ServerNew.Model.MongoModel.BuildData;
 import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Packet.ResponsePacket;
 import ServerNew.Packet.ManagerType.TypeResponse;
+import ServerNew.Utils.CryptoUtil;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -14,6 +15,8 @@ import org.java_websocket.WebSocket;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static ServerNew.Utils.CryptoUtil.secretKey;
 
 public class AuthController {
     private List<AuthData> playerInfoMap;
@@ -28,33 +31,41 @@ public class AuthController {
     }
 
     public ResponsePacket RegisterNewPlayer(AuthData newAuthData) {
-        if (newAuthData == null || newAuthData.getUserName().isEmpty() || newAuthData.getPassword().isEmpty()) {
-            return new ResponsePacket(TypeResponse.RESPONSE_REGISTER_FALSE, "Dữ liệu không hợp lệ!");
+        try {
+            if (newAuthData == null || newAuthData.getUserName().isEmpty() || newAuthData.getPassword().isEmpty()) {
+                return new ResponsePacket(TypeResponse.RESPONSE_REGISTER_FALSE, "Dữ liệu không hợp lệ!");
+            }
+
+            Document query = new Document("username", newAuthData.getUserName());
+            if (collectionAuth.find(query).first() != null) {
+                return new ResponsePacket(TypeResponse.RESPONSE_REGISTER_FALSE, "Tên người dùng đã tồn tại!");
+            }
+
+            // Mã hóa mật khẩu trước khi lưu
+            String encryptedPassword = CryptoUtil.encrypt(secretKey, newAuthData.getPassword());
+
+            Document newPlayer = new Document("username", newAuthData.getUserName())
+                    .append("password", encryptedPassword)
+                    .append("status", true);
+            collectionAuth.insertOne(newPlayer);
+
+            PlayerInfo playerInfoInit = new PlayerInfo(newAuthData.getUserName(),
+                    newAuthData.getSocket() != null ? newAuthData.getSocket().getRemoteSocketAddress().toString() : "Unknown",
+                    "default",
+                    0,
+                    new AssetData(),
+                    new BuildData()
+            );
+            // Khởi tạo thông tin người chơi mới
+            Document newInfoPlayer = PlayerInfo.ToDocument(playerInfoInit);
+            collectionPlayerInfo.insertOne(newInfoPlayer);
+
+            playerInfoMap.add(newAuthData);
+            return new ResponsePacket(TypeResponse.RESPONSE_REGISTER_TRUE, "Đăng kí thành công");
+        } catch (Exception e) {
+            System.out.println("Lỗi xử lý mã hóa: " + e.getMessage());
+            return new ResponsePacket(TypeResponse.RESPONSE_REGISTER_FALSE, "Đăng ký thất bại do lỗi hệ thống!");
         }
-
-        Document query = new Document("username", newAuthData.getUserName());
-        if (collectionAuth.find(query).first() != null) {
-            return new ResponsePacket(TypeResponse.RESPONSE_REGISTER_FALSE, "Tên người dùng đã tồn tại!");
-        }
-
-        Document newPlayer = new Document("username", newAuthData.getUserName())
-                .append("password", newAuthData.getPassword())
-                .append("status", true);
-        collectionAuth.insertOne(newPlayer);
-
-        PlayerInfo playerInfoInit = new PlayerInfo(newAuthData.getUserName(),
-                newAuthData.getSocket().getRemoteSocketAddress().toString(),
-                "default",
-                0,
-                new AssetData(),
-                new BuildData()
-        );
-        //Init asset new player
-        Document newInfoPlayer = PlayerInfo.ToDocument(playerInfoInit);
-        collectionPlayerInfo.insertOne(newInfoPlayer);
-
-        playerInfoMap.add(newAuthData);
-        return new ResponsePacket(TypeResponse.RESPONSE_REGISTER_TRUE, "Đăng kí thành công");
     }
 
     public ResponsePacket LoginPlayer(AuthData loginAuthData) {
@@ -63,8 +74,7 @@ public class AuthController {
             return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_FALSE, "Dữ liệu không hợp lệ!");
         }
 
-        Document query = new Document("username", loginAuthData.getUserName())
-                .append("password", loginAuthData.getPassword());
+        Document query = new Document("username", loginAuthData.getUserName());
         Document result = collectionAuth.find(query).first();
 
         if (result == null) {
@@ -72,17 +82,33 @@ public class AuthController {
             return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_FALSE, "Sai tên người dùng hoặc mật khẩu!");
         }
 
-        boolean isOnline = result.getBoolean("status", false);
-        if (isOnline) {
-            System.out.println("Người dùng này đã online!");
-            return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_FALSE, "Người dùng này đã online!");
+        try {
+            // Giải mã mật khẩu
+            String decryptedPassword = CryptoUtil.decrypt(secretKey, result.getString("password"));
+
+            if (!decryptedPassword.equals(loginAuthData.getPassword())) {
+                System.out.println("Sai tên người dùng hoặc mật khẩu!");
+                return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_FALSE, "Sai tên người dùng hoặc mật khẩu!");
+            }
+
+            boolean isOnline = result.getBoolean("status", false);
+            if (isOnline) {
+                System.out.println("Người dùng này đã online!");
+                return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_FALSE, "Người dùng này đã online!");
+            }
+
+            updateIpPlayer(loginAuthData.getUserName(), loginAuthData.getSocket().getRemoteSocketAddress().toString());
+            updatePlayerStatus(loginAuthData.getUserName(), true);
+            playerInfoMap.add(loginAuthData);
+            System.out.println("Đăng nhập thành công!");
+            return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_TRUE, "Đăng nhập thành công!");
+        } catch (Exception e) {
+            System.out.println("Lỗi xử lý mã hóa: " + e.getMessage());
+            return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_FALSE, "Lỗi xử lý dữ liệu!");
         }
-        updateIpPlayer(loginAuthData.getUserName(), loginAuthData.getSocket().getRemoteSocketAddress().toString());
-        updatePlayerStatus(loginAuthData.getUserName(), true);
-        playerInfoMap.add(loginAuthData);
-        System.out.println("Đăng nhập thành công!");
-        return new ResponsePacket(TypeResponse.RESPONSE_LOGIN_TRUE, "Đăng nhập thành công!");
     }
+
+
 
     private void updatePlayerStatus(String username, boolean status) {
         Document query = new Document("username", username);
