@@ -12,7 +12,7 @@ public class Shop {
 
     public Shop() {
         this.gold = new Resource(500, 150, 120, 500, 0.1f);
-        this.iron = new Resource(1000, 30, 24, 1000, 0.05f);
+        this.iron = new Resource(1000, 30, 24, 1000, 0.03f);
         this.food = new Resource(2000, 5, 4, 2000, 0.005f);
     }
 

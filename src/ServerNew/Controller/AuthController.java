@@ -12,7 +12,9 @@ import ServerNew.Utils.EmailUtil;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.java_websocket.WebSocket;
 
 import java.util.ArrayList;
@@ -231,6 +233,32 @@ public class AuthController {
             System.out.println("Lỗi xử lý mã hóa: " + e.getMessage());
         }
     }
+
+    public ResponsePacket GetPlayerCanAttack() {
+        List<PlayerInfo> listPlayerCanAttack = new ArrayList<>();
+        Bson statusFilter = Filters.gt("dayPlayer", 10);
+
+        // Truy vấn tất cả người chơi có dayPlayer > 10
+        List<Document> activePlayers = collectionPlayerInfo.find(statusFilter).into(new ArrayList<>());
+
+        if (activePlayers.isEmpty()) {
+            // Ghi log hoặc thực hiện hành động khác nếu không có người chơi nào thỏa mãn
+            System.out.println("Không có người chơi nào có dayPlayer > 10");
+        }
+
+        for (Document doc : activePlayers) {
+            // Kiểm tra null trước khi chuyển đổi
+            if (doc != null) {
+                PlayerInfo playerInfo = PlayerInfo.fromDocument(doc);
+                if (playerInfo != null) {
+                    listPlayerCanAttack.add(playerInfo);
+                }
+            }
+        }
+
+        return new ResponsePacket(TypeResponse.RESPONSE_PLAYER_ATTACK, listPlayerCanAttack);
+    }
+
 
     public List<AuthData> getPlayerInfoMap() {
         return playerInfoMap;

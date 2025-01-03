@@ -72,7 +72,11 @@ public class GroundController {
 
             collectionPlayerInfo.updateOne(
                     Filters.eq("username", buildGround.getUsername()),
-                    Updates.set("buildData.comboBuilders.$[elem].statusBuild", TypeStatusGround.OPEN),
+                    Updates.combine(
+                            Updates.set("buildData.comboBuilders.$[elem].statusBuild", TypeStatusGround.OPEN),
+                            Updates.set("buildData.comboBuilders.$[elem].reward", buildGround.getReward())
+                    ),
+
                     new com.mongodb.client.model.UpdateOptions().arrayFilters(
                             List.of(Filters.eq("elem.sttBuild", indexGround))
                     )
@@ -135,7 +139,8 @@ public class GroundController {
                     Filters.eq("username", buildGround.getUsername()),
                     Updates.combine(
                             Updates.set("buildData.comboBuilders.$[elem].statusBuild", TypeStatusGround.HAVE_BUILD),
-                            Updates.set("buildData.comboBuilders.$[elem].typeBuild", buildGround.getTypeBuild())
+                            Updates.set("buildData.comboBuilders.$[elem].typeBuild", buildGround.getTypeBuild()),
+                            Updates.set("buildData.comboBuilders.$[elem].reward", buildGround.getReward())
                     ),
                     new com.mongodb.client.model.UpdateOptions().arrayFilters(
                             List.of(Filters.eq("elem.sttBuild", indexGround))

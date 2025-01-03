@@ -14,5 +14,6 @@ public class TypeRequest {
     public static final String MESSAGE = "message";
     public static final String BUY = "buy";
     public static final String SELL = "sell";
+    public static final String GET_PLAYER_ATTACK = "getPlayerAttack";
 
 }

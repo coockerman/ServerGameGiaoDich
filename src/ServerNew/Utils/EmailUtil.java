@@ -28,16 +28,30 @@ public class EmailUtil {
         });
 
         try {
-            // Tạo tin nhắn email
+            // Tạo tin nhắn email với HTML
+            String emailContent = "<html>" +
+                    "<body>" +
+                    "<h2 style='color: #4CAF50;'>Đế chế giao dịch xin chào,</h2>" +
+                    "<p>Mật khẩu tài khoản của bạn là:</p>" +
+                    "<p style='font-size: 20px; font-weight: bold; color: #FF6347;'>" + password + "</p>" +
+                    "<p>Vui lòng không tiết lộ mật khẩu này cho người khác.</p>" +
+                    "<p style='color: gray;'>Trân trọng,<br>Đội ngũ Đế chế giao dịch</p>" +
+                    "<footer style='font-size: 10px; color: gray; text-align: center;'>" +
+                    "Nếu bạn không yêu cầu thay đổi mật khẩu, vui lòng bỏ qua email này." +
+                    "</footer>" +
+                    "</body>" +
+                    "</html>";
+
+// Tạo MimeMessage
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(username));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail));
             message.setSubject("Mật khẩu tài khoản của bạn");
-            message.setText("Đế chế giao dịch xin chào,\n" +
-                    "Mật khẩu tài khoản của bạn là: " + password + "\n" +
-                    "Vui lòng không tiết lộ mật khẩu này của bạn cho người khác.");
 
-            // Gửi email
+// Thiết lập kiểu nội dung là HTML
+            message.setContent(emailContent, "text/html; charset=utf-8");
+
+// Gửi email
             Transport.send(message);
             System.out.println("Email chứa mật khẩu đã được gửi thành công!");
 

@@ -8,6 +8,7 @@ public class BuildGround {
     private String username;
     private int position;
     private String typeBuild;
+    private int reward;
     private List<ComboItem> comboItemList;
 
     public BuildGround(String username,int position, String typeBuild, List<ComboItem> comboItemList) {
@@ -39,6 +40,14 @@ public class BuildGround {
 
     public void setTypeBuild(String typeBuild) {
         this.typeBuild = typeBuild;
+    }
+
+    public int getReward() {
+        return reward;
+    }
+
+    public void setReward(int reward) {
+        this.reward = reward;
     }
 
     public List<ComboItem> getComboItemList() {

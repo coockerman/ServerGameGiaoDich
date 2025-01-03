@@ -11,17 +11,17 @@ public class BuildData {
 
     public BuildData() {
         this.comboBuilders = new ArrayList<>();
-        this.comboBuilders.add(new ComboBuilder(0, null, TypeStatusGround.OPEN));
-        this.comboBuilders.add(new ComboBuilder(1, null, TypeStatusGround.OPEN));
-        this.comboBuilders.add(new ComboBuilder(2, null, TypeStatusGround.OPEN));
-        this.comboBuilders.add(new ComboBuilder(3, null, TypeStatusGround.OPEN));
-        this.comboBuilders.add(new ComboBuilder(4, null, TypeStatusGround.NOT_OPEN));
-        this.comboBuilders.add(new ComboBuilder(5, null, TypeStatusGround.NOT_OPEN));
-        this.comboBuilders.add(new ComboBuilder(6, null, TypeStatusGround.NOT_OPEN));
-        this.comboBuilders.add(new ComboBuilder(7, null, TypeStatusGround.NOT_OPEN));
-        this.comboBuilders.add(new ComboBuilder(8, null, TypeStatusGround.NOT_OPEN));
-        this.comboBuilders.add(new ComboBuilder(9, null, TypeStatusGround.NOT_OPEN));
-        this.comboBuilders.add(new ComboBuilder(10, null, TypeStatusGround.NOT_OPEN));
+        this.comboBuilders.add(new ComboBuilder(0, null, 0,TypeStatusGround.OPEN));
+        this.comboBuilders.add(new ComboBuilder(1, null, 0,TypeStatusGround.OPEN));
+        this.comboBuilders.add(new ComboBuilder(2, null, 0,TypeStatusGround.OPEN));
+        this.comboBuilders.add(new ComboBuilder(3, null, 0,TypeStatusGround.OPEN));
+        this.comboBuilders.add(new ComboBuilder(4, null, 0,TypeStatusGround.NOT_OPEN));
+        this.comboBuilders.add(new ComboBuilder(5, null, 0,TypeStatusGround.NOT_OPEN));
+        this.comboBuilders.add(new ComboBuilder(6, null, 0,TypeStatusGround.NOT_OPEN));
+        this.comboBuilders.add(new ComboBuilder(7, null, 0,TypeStatusGround.NOT_OPEN));
+        this.comboBuilders.add(new ComboBuilder(8, null, 0,TypeStatusGround.NOT_OPEN));
+        this.comboBuilders.add(new ComboBuilder(9, null, 0,TypeStatusGround.NOT_OPEN));
+        this.comboBuilders.add(new ComboBuilder(10, null, 0,TypeStatusGround.NOT_OPEN));
     }
 
     public List<ComboBuilder> getComboBuilders() {

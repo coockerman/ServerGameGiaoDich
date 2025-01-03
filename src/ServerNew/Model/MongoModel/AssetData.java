@@ -12,11 +12,11 @@ public class AssetData {
 
     // Constructor mặc định
     public AssetData() {
-        this.countMoney = 500;
+        this.countMoney = 2000;
         this.assets = new ArrayList<>();
-        this.assets.add(new ComboItem(TypeObject.FOOD, 100));
-        this.assets.add(new ComboItem(TypeObject.IRON, 100));
-        this.assets.add(new ComboItem(TypeObject.GOLD, 100));
+        this.assets.add(new ComboItem(TypeObject.FOOD, 600));
+        this.assets.add(new ComboItem(TypeObject.IRON, 150));
+        this.assets.add(new ComboItem(TypeObject.GOLD, 60));
         this.assets.add(new ComboItem(TypeObject.MELEE, 0));
         this.assets.add(new ComboItem(TypeObject.ARROW, 0));
         this.assets.add(new ComboItem(TypeObject.CAVALRY, 0));
@@ -65,13 +65,15 @@ public class AssetData {
     }
 
     // Chuyển Document thành đối tượng
+    // Chuyển Document thành đối tượng
     public static AssetData FromDocument(Document document) {
-        int countMoney = document.getInteger("countMoney", 0);
-        List<Document> assetDocs = (List<Document>) document.get("assets");
-        List<ComboItem> assets = new ArrayList<>();
-        for (Document doc : assetDocs) {
-            assets.add(ComboItem.fromDocument(doc));
+        AssetData newAssetData = new AssetData();
+        newAssetData.assets = new ArrayList<>();
+        newAssetData.countMoney = document.getInteger("countMoney", 0);
+        List<Document> assetsList = (List<Document>) document.get("assets");
+        for (Document doc : assetsList) {
+            newAssetData.assets.add(ComboItem.fromDocument(doc));
         }
-        return new AssetData(countMoney, assets);
+        return newAssetData;
     }
 }

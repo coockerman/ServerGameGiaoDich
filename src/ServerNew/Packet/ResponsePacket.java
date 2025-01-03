@@ -4,12 +4,15 @@ import ServerNew.Model.ChatMessage;
 import ServerNew.Model.MongoModel.PlayerInfo;
 import ServerNew.Model.UpdateStore.UpdateStoreData;
 
+import java.util.List;
+
 public class ResponsePacket {
     private String typeResponse;
     private String callbackResult;
     private PlayerInfo playerInfo;
     private UpdateStoreData updateStoreData;
     private ChatMessage chatMessage;
+    private List<PlayerInfo> titleAllPlayer;
 
     public ResponsePacket(String typeResponse, String callbackResult) {
         this.typeResponse = typeResponse;
@@ -38,6 +41,11 @@ public class ResponsePacket {
     public ResponsePacket(String typeResponse, ChatMessage chatMessage) {
         this.typeResponse = typeResponse;
         this.chatMessage = chatMessage;
+    }
+
+    public ResponsePacket(String typeResponse, List<PlayerInfo> titleAllPlayer) {
+        this.typeResponse = typeResponse;
+        this.titleAllPlayer = titleAllPlayer;
     }
 
     public String getTypeResponse() {
@@ -78,5 +86,13 @@ public class ResponsePacket {
 
     public void setChatMessage(ChatMessage chatMessage) {
         this.chatMessage = chatMessage;
+    }
+
+    public List<PlayerInfo> getTitleAllPlayer() {
+        return titleAllPlayer;
+    }
+
+    public void setTitleAllPlayer(List<PlayerInfo> titleAllPlayer) {
+        this.titleAllPlayer = titleAllPlayer;
     }
 }

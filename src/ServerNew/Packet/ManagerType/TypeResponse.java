@@ -24,4 +24,6 @@ public class TypeResponse {
     public static final String RESPONSE_MESSAGE = "responseMessage";
 
     public static final String RESPONSE_UPDAY = "responseUpday";
+
+    public static final String RESPONSE_PLAYER_ATTACK = "responsePlayerAttack";
 }

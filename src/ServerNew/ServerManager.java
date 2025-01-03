@@ -184,6 +184,13 @@ public class ServerManager extends WebSocketServer {
                     broadcastMessage(response);
                     break;
 
+                case TypeRequest.GET_PLAYER_ATTACK:
+                    // chatGet = getRequest.getChatMessage();
+                    //ResponsePacket responsePlayerAttack = new ResponsePacket(TypeResponse.RESPONSE_PLAYER_ATTACK, chatGet);
+                    System.out.println("Gửi dữ liệu những người đã chơi trên 10 ngày");
+                    ResponseDataToClient(webSocket, authController.GetPlayerCanAttack());
+                    break;
+
                 default:
                     System.err.println("Chưa có hàm xử lý yêu cầu này!!!");
                     break;
